@@ -62,7 +62,7 @@ const MigrationDashboard = () => {
   }
 
   const filteredRowObject = { ...data };
-  const KEYS_TO_REMOVE = ["Visa type", "May", "Jun"];
+  const KEYS_TO_REMOVE = ["Visa type", "Apr", "May", "Jun"];
   KEYS_TO_REMOVE.forEach((key) => {
     delete filteredRowObject[key];
   });
@@ -70,6 +70,7 @@ const MigrationDashboard = () => {
 
   return (
     <div style={{ padding: "5px", overflow: "auto" }}>
+      <h2>Invitation Number By Month</h2>
       <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
         {entries.map(([key, value]) => (
           <li
