@@ -25,6 +25,8 @@ ChartJS.register(
   Legend,
 );
 
+import MigrationDashboard from "./migration/migration.jsx";
+
 export default function Admin() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -201,6 +203,12 @@ export default function Admin() {
       )}
 
       <div className={styles.grid}>
+        <section className={`${styles.section} ${styles.card}`}>
+          <div className={styles.chartWrap}>
+            <MigrationDashboard />
+          </div>
+        </section>
+
         <section className={`${styles.section} ${styles.card}`}>
           <h2>Total Sync Count (last 7 days)</h2>
           <div className={styles.syncNumber}>
