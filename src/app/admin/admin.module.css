@@ -48,6 +48,12 @@
   height: clamp(260px, 45vh, 460px);
 }
 
+.chartWrap_migration {
+  position: relative;
+  width: 100%;
+  height: clamp(480px, 60vh, 600px);
+}
+
 .syncNumber {
   font-size: 2.5rem;
   font-weight: 600;

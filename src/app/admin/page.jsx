@@ -204,7 +204,7 @@ export default function Admin() {
 
       <div className={styles.grid}>
         <section className={`${styles.section} ${styles.card}`}>
-          <div className={styles.chartWrap}>
+          <div className={styles.chartWrap_migration}>
             <MigrationDashboard />
           </div>
         </section>

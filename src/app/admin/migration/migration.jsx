@@ -25,7 +25,7 @@ const MigrationDashboard = () => {
         }
 
         const result = await response.json();
-        setData(result.rows);
+        setData(result);
       } catch (err) {
         setError(err.message);
         console.error("Migration Fetch Error:", err);
@@ -61,12 +61,7 @@ const MigrationDashboard = () => {
     );
   }
 
-  const filteredRowObject = { ...data };
-  const KEYS_TO_REMOVE = ["Visa type", "Apr", "May", "Jun"];
-  KEYS_TO_REMOVE.forEach((key) => {
-    delete filteredRowObject[key];
-  });
-  const entries = Object.entries(filteredRowObject);
+  const entries = Object.entries(data);
 
   return (
     <div style={{ padding: "5px", overflow: "auto" }}>
