@@ -25,7 +25,7 @@ const MigrationDashboard = () => {
         }
 
         const result = await response.json();
-        setData(result);
+        setData(result.rows);
       } catch (err) {
         setError(err.message);
         console.error("Migration Fetch Error:", err);
@@ -53,7 +53,7 @@ const MigrationDashboard = () => {
     );
   }
 
-  if (!data || !data.columns || !data.rows) {
+  if (!data) {
     return (
       <div style={{ padding: "20px", color: "orange" }}>
         Data structure is invalid or empty.
@@ -61,50 +61,36 @@ const MigrationDashboard = () => {
     );
   }
 
-  const renderTable = () => (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr>
-          {data.columns.map((col, index) => (
-            <th
-              key={index}
-              style={{
-                padding: "5px",
-                backgroundColor: "#f2f2f2",
-              }}
-            >
-              {col}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.rows.map((row, rowIndex) => {
-          const isTotalRow = row["Visa type"] === "Total to date";
-          const rowStyle = isTotalRow
-            ? { fontWeight: "bold", backgroundColor: "#fff3e0" }
-            : {};
+  const filteredRowObject = { ...data };
+  const KEYS_TO_REMOVE = ["Visa type", "May", "Jun"];
+  KEYS_TO_REMOVE.forEach((key) => {
+    delete filteredRowObject[key];
+  });
+  const entries = Object.entries(filteredRowObject);
 
-          return (
-            <tr key={rowIndex} style={rowStyle}>
-              {data.columns.map((colName, colIndex) => (
-                <td
-                  key={colIndex}
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  {row[colName]}
-                </td>
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+  return (
+    <div style={{ padding: "5px", overflow: "auto" }}>
+      <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+        {entries.map(([key, value]) => (
+          <li
+            key={key}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "8px 0",
+              fontSize: "1em",
+              borderBottom: "1px dotted #e0e0e0",
+            }}
+          >
+            <span style={{ fontWeight: "600", color: "#333" }}>{key}:</span>
+            <span style={{ color: "#007bff" }}>
+              {value === "-" ? "0" : value}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
-
-  return <div>{renderTable()}</div>;
 };
 
 export default MigrationDashboard;
