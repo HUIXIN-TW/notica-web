@@ -4,8 +4,8 @@ import logger, { isProdRuntime as isProd } from "@utils/shared/logger";
 
 export function getPollingTimings() {
   return {
-    initialWaitMs: isProd ? 10_000 : 5_000,
-    intervalMs: isProd ? 10_000 : 10_000,
+    initialWaitMs: isProd ? 10_000 : 5_000, // 10s prod / 5s dev
+    intervalMs: isProd ? 2_500 : 10_000, // 2.5s prod / 10s dev
     maxTotalMs: isProd ? 300_000 : 600_000, // 5min prod / 10min dev
     skewMs: 3_000,
   };
