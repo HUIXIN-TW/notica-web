@@ -240,7 +240,6 @@ export default function Admin() {
             )}
           </div>
         </section>
-
       </div>
     </div>
   );
