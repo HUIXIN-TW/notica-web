@@ -69,9 +69,9 @@ export default function Admin() {
     }
   }
 
-  // useEffect(() => {
-  //   if (status === "authenticated" && session?.user?.role === "admin") load();
-  // }, [status, session]);
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role === "admin") load();
+  }, [status, session]);
 
   const usersChart = useMemo(() => {
     const labels = (userCounts ?? []).map((d) => d.createdAt);
