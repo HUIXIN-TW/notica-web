@@ -188,13 +188,13 @@ export default function Admin() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.actions}>
+      {/* <div className={styles.actions}>
         <Button
           text={loading ? "Refreshing…" : "Refresh"}
           onClick={load}
           disabled={loading}
         />
-      </div>
+      </div> */}
 
       {error && (
         <div className={styles.section}>
@@ -208,7 +208,16 @@ export default function Admin() {
             <MigrationDashboard />
           </div>
         </section>
-
+        <section className={`${styles.section} ${styles.card}`}>
+          <h2>Users (last 14 days)</h2>
+          <div className={styles.chartWrap}>
+            {userCounts ? (
+              <Line data={usersChart.data} options={usersChart.options} />
+            ) : (
+              <div>No data</div>
+            )}
+          </div>
+        </section>
         <section className={`${styles.section} ${styles.card}`}>
           <h2>Total Sync Count (last 7 days)</h2>
           <div className={styles.syncNumber}>
@@ -231,16 +240,7 @@ export default function Admin() {
             )}
           </div>
         </section>
-        <section className={`${styles.section} ${styles.card}`}>
-          <h2>Users (last 14 days)</h2>
-          <div className={styles.chartWrap}>
-            {userCounts ? (
-              <Line data={usersChart.data} options={usersChart.options} />
-            ) : (
-              <div>No data</div>
-            )}
-          </div>
-        </section>
+
       </div>
     </div>
   );
