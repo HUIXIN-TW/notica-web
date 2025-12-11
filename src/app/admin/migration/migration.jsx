@@ -3,12 +3,14 @@ import React, { useState, useEffect } from "react";
 const API_ENDPOINT =
   "https://pu4jh5g2fqmimsh6uykanud6iu0cjrdu.lambda-url.us-east-1.on.aws/";
 
-const MigrationDashboard = () => {
+const MigrationDashboard = ({ refreshKey = null }) => {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (refreshKey === null) return;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -35,7 +37,15 @@ const MigrationDashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [refreshKey]);
+
+  if (refreshKey === null) {
+    return (
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        Click refresh to load migration data.
+      </div>
+    );
+  }
 
   if (loading) {
     return (
