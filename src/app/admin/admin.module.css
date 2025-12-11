@@ -68,6 +68,95 @@
   margin-top: 0.5rem;
 }
 
+.logsTableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.logsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.logsTable th,
+.logsTable td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.logsTable thead th {
+  background: #fafafa;
+  color: #555;
+  position: sticky;
+  top: 0;
+}
+
+.timestampCell {
+  white-space: nowrap;
+}
+
+.mono {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 13px;
+}
+
+.logCell {
+  max-width: 420px;
+  white-space: normal;
+}
+
+.triggerBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.logCellContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.logTextCollapsed {
+  max-height: 3.6em;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.logTextExpanded {
+  white-space: pre-wrap;
+}
+
+.logToggle {
+  align-self: flex-start;
+  padding: 4px 8px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.logToggle:hover {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+}
+
 @media (max-width: 480px) {
   .section {
     width: min(90vw, 300px);
