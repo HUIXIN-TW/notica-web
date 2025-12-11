@@ -51,3 +51,40 @@ export async function getDailySyncCountsLastNDays(days = 7) {
   }
   return results;
 }
+
+export async function getLatestSyncLogs(limit = 20) {
+  const today = new Date();
+  const items = [];
+  const maxDaysToScan = 30;
+
+  for (let i = 0; items.length < limit && i < maxDaysToScan; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().split("T")[0]; // YYYY-MM-DD
+
+    let ExclusiveStartKey;
+
+    // Paginate through results for this date til we fill the limit
+    do {
+      const res = await ddb.send(
+        new QueryCommand({
+          TableName: TABLE_NAME,
+          IndexName: "dateTimestampIndex",
+          KeyConditionExpression: "#d = :date",
+          ExpressionAttributeNames: { "#d": "date" },
+          ExpressionAttributeValues: { ":date": dateStr },
+          ScanIndexForward: false, // newest first
+          Limit: limit - items.length,
+          ExclusiveStartKey,
+        }),
+      );
+
+      items.push(...(res.Items || []));
+      ExclusiveStartKey = res.LastEvaluatedKey;
+    } while (items.length < limit && ExclusiveStartKey);
+  }
+
+  // Ensure final list is globally sorted across days
+  items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  return items.slice(0, limit);
+}
