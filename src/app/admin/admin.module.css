@@ -6,7 +6,6 @@
   line-height: 2;
   padding: 10px;
   width: 90vw;
-  max-width: 900px;
   height: auto;
 }
 
@@ -26,6 +25,7 @@
 
 .section {
   width: min(90vw, 1200px);
+  padding: 10px;
 }
 
 .card {
@@ -105,7 +105,6 @@
 }
 
 .logCell {
-  max-width: 420px;
   white-space: normal;
 }
 
