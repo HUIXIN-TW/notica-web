@@ -93,5 +93,9 @@ You can rename columns freely as long as you map them correctly in your [Notion 
 
 - **Sync failed:** Double-check your Database ID and Calendar ID.
 - **Permission issue:** Ensure both Notion and Google Calendar integrations have full access.
-- **No updates appearing:** Confirm you’re editing the correct Notion database and calendar.
+- **No updates appearing:** Confirm you're editing the correct Notion database and calendar.
 - **Multiple workspaces:** Verify you authorized the correct Notion workspace during setup.
+
+## Contact
+
+For questions, support, or feedback, please reach out to us: [coffee@notica.studio](mailto:coffee@notica.studio) or [ceo@notica.studio](mailto:ceo@notica.studio) or [support@notica.studio](mailto:support@notica.studio)
