@@ -13,7 +13,7 @@ const config = {
   // User-based limits
   SYNC_USER_WINDOW_LIMIT: 1, // Limit per user UUID: allow 1 sync every 3 minutes
   SYNC_USER_WINDOW_MS: 3 * 60_000, // Time window for user-based limit (3 minutes)
-  SYNC_USER_MIN_MS: 3 * 60_000, // Minimum spacing between bursts for the same user (3 minutes)
+  SYNC_USER_MIN_MS: 1 * 60_000, // Minimum spacing between bursts for the same user (1 minute)
 
   // global defaults
   GLOBAL_IP_WINDOW_LIMIT: 100, // Limit per IP address: allow 100 requests per minute
