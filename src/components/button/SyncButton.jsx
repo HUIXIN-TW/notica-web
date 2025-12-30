@@ -1,5 +1,6 @@
 "use client";
-
+import logger from "@utils/shared/logger";
+import { pollLastSyncLog } from "@utils/client/polling-user-last-sync-log";
 import { useState } from "react";
 import Button from "@components/button/Button";
 import { useSession } from "next-auth/react";
@@ -9,7 +10,9 @@ const SyncButton = ({ text, onSync, disabled }) => {
   const [loading, setLoading] = useState(false);
 
   async function triggerSync() {
+    logger.debug("[SyncButton] onClick fired", { loading, disabled });
     if (!session?.user) {
+      logger.warn("[SyncButton] no session user; prompting login");
       alert("Please log in to sync.");
       return;
     }
@@ -20,25 +23,46 @@ const SyncButton = ({ text, onSync, disabled }) => {
     };
 
     const syncPromise = (async () => {
+      if (loading) return;
       setLoading(true);
       try {
+        // trigger sync
+        const enqueueAtMs = Date.now();
         const res = await fetch("/api/sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
 
-        const result = await res.json();
+        const triggerResult = await res.json().catch(() => ({}));
         if (!res.ok) {
-          alert("Sync failed: " + result.message);
-          console.error("Sync failed:", result);
+          const msg = triggerResult.message || JSON.stringify(triggerResult);
+          let userMsg = msg;
+
+          if (
+            msg.includes("Insufficient Permission") ||
+            msg.includes("insufficientPermissions") ||
+            msg.includes("insufficient authentication scopes")
+          ) {
+            userMsg =
+              "Insufficient permission.\nGo to Settings → reconnect Google Calendar.\nRemember to click **Select all** when authorizing.";
+          }
+
+          alert(userMsg);
+          logger.error("Sync failed", triggerResult);
+          return { type: "error", message: userMsg, raw: triggerResult };
         }
-        return result;
+
+        logger.debug("[SyncButton] sync enqueued", triggerResult);
+        // poll for completion
+        return await pollLastSyncLog({
+          triggerTimeMs: enqueueAtMs,
+        });
       } catch (err) {
-        console.error("Sync error:", err);
+        logger.error("Sync error", err);
         return { type: "error", message: err.message };
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 3000);
       }
     })();
 

@@ -1,8 +1,10 @@
-# NotionSyncGCal Frontend
+# NOTICA
 
 [![Deploy on Amplify](https://img.shields.io/badge/Deploy-AWS%20Amplify-orange?logo=awsamplify&style=for-the-badge)](https://console.aws.amazon.com/amplify/home)
 
-[![Live Demo](https://img.shields.io/badge/View-Live%20Demo-green?style=for-the-badge)](https://notionsyncgcal.huixinyang.com/)
+[![Live Demo](https://img.shields.io/badge/View-Live%20Demo-green?style=for-the-badge)](https://notica.studio/)
+
+![alt text](images/notica.png)
 
 A modern web application that provides a user interface for synchronizing Notion pages with Google Calendar events. This frontend interfaces with the NotionSyncGCal backend service to help users manage their calendar synchronization seamlessly.
 
@@ -31,13 +33,13 @@ Before you begin, ensure you have the following installed:
 1. Clone the repository to your local machine:
 
 ```bash
-git clone git@github.com:HUIXIN-TW/NotionSyncGCalFrontend.git
+git clone git@github.com:HUIXIN-TW/NOTICA.git
 ```
 
 2. Navigate into the project directory:
 
 ```bash
-cd NotionSyncGCalFrontend
+cd NOTICA
 ```
 
 3. Install the required dependencies:
@@ -67,24 +69,17 @@ yarn dev
 
 6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-![image](./images/image.png)
+## Security
 
-## DynamoDB Setup
-
-This project uses AWS DynamoDB instead of MongoDB. Follow these steps to set up your DynamoDB environment:
-
-1. Create a DynamoDB table named `Users` with the following configuration:
-   - Partition key: `uuid` (String)
-   - Sort key: None (optional)
-
-2. Create a Global Secondary Index (GSI) named `EmailIndex` on the `Users` table:
-   - Partition key: `email` (String)
-   - Sort key: None
+Never share or commit your personal credentials, OAuth secrets, or JWT keys.
+If you believe you’ve found a security vulnerability, please read our
+[SECURITY.md](./SECURITY.md) policy and report it responsibly.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome pull requests that improve code quality, documentation, or UI/UX.
+Before contributing, review the [CONTRIBUTING.md](./CONTRIBUTING.md) guide.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.

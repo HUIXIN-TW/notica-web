@@ -1,134 +1,167 @@
+import "server-only";
+
+import logger, { isProdRuntime as isProd } from "@utils/shared/logger";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
-import { connectToDatabase } from "@utils/db-connection";
-import User from "@models/user";
-
-const isProd = process.env.NODE_ENV === "production";
+import {
+  createUser,
+  getUserByProviderSub,
+  updateLastLogin,
+} from "@models/user";
+import { cookies } from "next/headers";
+import { uploadNotionConfigTemplateByUuid } from "@models/user";
 
 // Define and export NextAuth configuration for shared use
 export const authOptions = {
   debug: !isProd,
   secret: process.env.NEXTAUTH_SECRET,
+  // Allow NextAuth session cookies inside the Notion iframe. SameSite=None is
+  // required so third-party requests (the embed) can include the session, and
+  // Secure/httpOnly keeps the cookie scoped to HTTPS only. The embed itself is
+  // restricted to Notion domains via next.config.js `frame-ancestors`.
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        path: "/",
+      },
+    },
+    callbackUrl: {
+      name: "__Secure-next-auth.callback-url",
+      options: {
+        sameSite: "none",
+        secure: true,
+        path: "/",
+      },
+    },
+    csrfToken: {
+      name: "__Host-next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        path: "/",
+      },
+    },
+  },
 
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        // connect and fetch credential user
-        await connectToDatabase();
-        const user = await User.findOne({ email: credentials.email });
-        if (!user || user.provider !== "credentials") {
-          throw new Error("Invalid email or login method");
-        }
-        const validPassword = await bcrypt.compare(
-          credentials.password,
-          user.password,
-        );
-        if (!validPassword) {
-          throw new Error("Invalid email or password");
-        }
-        return {
-          uuid: user.uuid,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-          image: user.image,
-        };
-      },
-    }),
     GoogleProvider({
       name: "Google",
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: "openid email profile",
+          prompt: "select_account",
+        },
+      },
     }),
   ],
 
   callbacks: {
     async jwt({ token, user, account }) {
-      if (!isProd) console.log("jwt() — token before:", token);
+      // —— Google OAuth sign-in path
+      if (account?.provider === "google" && user) {
+        // google oauth login
+        token.provider = "google";
+        const sub = account.providerAccountId;
+        token.providerSub = sub;
 
-      if (user) {
-        token.uuid = user.uuid || token.uuid;
-        token.email = user.email || token.email;
-        token.username =
-          user.username || user.name || user.email?.split("@")[0];
-        token.image = user.image || token.image;
-        token.role = user.role || token.role;
-
-        await connectToDatabase();
-
-        // If user signed in via Google
-        if (account?.provider === "google") {
-          token.provider = "google";
-
-          // Fetch user from database to populate uuid and role
-
-          const dbUser = await User.findOne({ email: user.email });
-          if (dbUser) {
-            token.uuid = dbUser.uuid;
-            token.role = dbUser.role;
-          } else {
-            console.log("User not found in DB, creating new user...");
-            // Create a new user in the database if not found
-            token.uuid = user.uuid || "pending";
-            token.role = user.role || "pending";
+        // Upsert user by providerSub
+        let dbUser = await getUserByProviderSub("google", sub);
+        if (!dbUser) {
+          token.isNewUser = true; // Mark as new user
+          dbUser = await createUser({
+            email: user.email,
+            username: user.username || user.name || user.email.split("@")[0],
+            provider: "google",
+            providerSub: sub,
+            image: user.image || "",
+            role: "user",
+          });
+          try {
+            await uploadNotionConfigTemplateByUuid(dbUser.uuid);
+          } catch (e) {
+            logger.warn("template init failed", e);
           }
         }
+        token.uuid = dbUser.uuid;
+        token.role = dbUser.role;
+      }
 
-        // If user signed in via credentials
-        if (account?.provider === "credentials") {
-          token.provider = "credentials";
-        }
+      // —— Common population when `user` exists (first sign-in)
+      if (user) {
+        token.email = user.email || token.email;
+        token.username =
+          user.username ||
+          user.name ||
+          user.email?.split("@")[0] ||
+          token.username;
+        token.image = user.image || token.image;
+        token.uuid = user.uuid || token.uuid;
+        token.role = user.role || token.role;
+      }
+
+      if (!token.username && token.email) {
+        token.username = token.email.split("@")[0];
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      if (!isProd) console.log("session() — token:", token);
+      // mark new user in session
+      session.isNewUser = !!token.isNewUser;
 
+      // Remove isNewUser from token to avoid persistence
+      // if (token.isNewUser) delete token.isNewUser;
       session.user = {
         ...session.user,
         uuid: token.uuid,
         email: token.email,
         username: token.username,
         role: token.role,
+        image: token.image,
+        provider: token.provider,
+        providerSub: token.providerSub,
       };
-
-      if (!isProd) console.log("session() — session returned:", session);
       return session;
     },
   },
 
-  // Create or update user record when signing in via Google
   events: {
     async signIn({ user, account }) {
-      if (account.provider === "google") {
-        await connectToDatabase();
-        const existing = await User.findOne({ email: user.email });
-        if (!existing) {
-          await User.create({
-            email: user.email,
-            username: user.username || user.name || user.email.split("@")[0],
-            provider: "google",
-            image: user.image || "",
-            role: "user",
-          });
+      try {
+        let dbUser = null;
+
+        if (account?.provider === "google") {
+          dbUser = await getUserByProviderSub(
+            "google",
+            account.providerAccountId,
+          );
         }
+
+        if (dbUser) {
+          // Update lastLoginAt and lastLoginLocation
+          const cookieStore = await cookies();
+          const ip = cookieStore.get("client_ip")?.value ?? "unknown";
+          logger.info("updateLastLogin", { uuid: dbUser.uuid, ip });
+          await updateLastLogin(dbUser.uuid, ip);
+        }
+      } catch (err) {
+        logger.warn("Failed to update lastLogin / location", err);
       }
     },
   },
 
   pages: {
-    signIn: "/authflow",
+    signIn: "/",
     signOut: "/",
-    error: "/api/auth/error",
+    error: "/error",
   },
 };
 

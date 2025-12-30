@@ -1,8 +1,8 @@
 "use client";
-
-import { useEffect } from "react";
+import logger from "@utils/shared/logger";
 import { useRouter } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 import Profile from "@components/profile/Profile";
 
@@ -13,14 +13,14 @@ const MyProfile = () => {
   useEffect(() => {
     // If the status is not "loading" and there's no session, redirect
     if (status !== "loading" && !session) {
-      console.log("No session, redirecting to authflow");
-      router.push("/authflow");
+      logger.info("No session, redirecting to authflow");
+      router.push("/");
     }
   }, [session, status, router]);
 
   return (
     <div>
-      <Profile session={session} signOut={signOut} />
+      <Profile session={session} />
     </div>
   );
 };

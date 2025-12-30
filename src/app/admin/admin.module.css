@@ -1,0 +1,167 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  line-height: 2;
+  padding: 10px;
+  width: 90vw;
+  height: auto;
+}
+
+.actions {
+  width: min(90vw, 1200px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.section {
+  width: min(90vw, 1200px);
+  padding: 10px;
+}
+
+.card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(230, 230, 230, 0.8);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.card h2 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+.chartWrap {
+  position: relative;
+  width: 100%;
+  height: clamp(260px, 45vh, 460px);
+}
+
+.chartWrap_migration {
+  position: relative;
+  width: 100%;
+  height: clamp(480px, 60vh, 600px);
+}
+
+.syncNumber {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #6366f1; /* Indigo-500 */
+  margin-top: 1rem;
+}
+
+.syncLabel {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.logsTableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.logsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.logsTable th,
+.logsTable td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.logsTable thead th {
+  background: #fafafa;
+  color: #555;
+  position: sticky;
+  top: 0;
+}
+
+.timestampCell {
+  white-space: nowrap;
+}
+
+.mono {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 13px;
+}
+
+.logCell {
+  white-space: normal;
+}
+
+.triggerBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.logCellContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.logTextCollapsed {
+  max-height: 3.6em;
+  overflow: hidden;
+  white-space: pre-wrap;
+}
+
+.logTextExpanded {
+  white-space: pre-wrap;
+}
+
+.logToggle {
+  align-self: flex-start;
+  padding: 4px 8px;
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.logToggle:hover {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+}
+
+@media (max-width: 480px) {
+  .section {
+    width: min(90vw, 300px);
+    padding: 0 10px;
+  }
+  .card h2 {
+    font-size: 16px;
+  }
+}

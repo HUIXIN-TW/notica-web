@@ -1,21 +1,36 @@
 import "../styles/global.css";
 import Provider from "@components/provider/Provider";
+import TopNavBar from "@components/topnavbar/TopNavBar";
+import Footer from "@components/footer/Footer";
 
 export const metadata = {
-  title: "WhatNow Studio",
-  description: "two way sync between Notion and Google Calendar",
-  author: "Huixin Yang",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://huixinyang.com",
+  ),
+  title: {
+    default: "WhatNow Studio",
+    template: "%s | WhatNow Studio",
+  },
+  authors: [{ name: "Huixin Yang" }],
 };
 
 const RootLayout = ({ children }) => (
   <html lang="en">
     <body>
-      <div className="main">
-        <div className="gradient" />
+      <div className="gradient-layer" />
+      <div className="content-layer">
+        <Provider>
+          <div className="top-section">
+            <TopNavBar />
+          </div>
+          <div className="main-section">
+            <main>{children}</main>
+          </div>
+          <div className="footer-section">
+            <Footer />
+          </div>
+        </Provider>
       </div>
-      <Provider>
-        <main>{children}</main>
-      </Provider>
     </body>
   </html>
 );
