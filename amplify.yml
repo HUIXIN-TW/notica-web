@@ -4,39 +4,36 @@ frontend:
     preBuild:
       commands:
         - set -euo pipefail
-        # 1. Validate environment
-        - ': "${APP_ENV:?APP_ENV is required (production|staging|development)}"'
-        - echo "Fetching secrets from SSM for path /notion-sync-gcal/${APP_ENV}/..."
-
-        # 2. Fetch SSM parameters and transform into .env
-        # We echo the count of parameters found to verify connectivity without leaking data
+        - echo "Starting SSM Secret Injection..."
+        
+        # 1. Fetch from SSM and build .env 
+        # Using the awk logic to avoid 'jq' dependency
         - |
-          PARAMS_JSON=$(aws ssm get-parameters-by-path \
+          aws ssm get-parameters-by-path \
             --region ap-southeast-2 \
             --path "/notion-sync-gcal/${APP_ENV}/" \
             --recursive \
-            --with-decryption)
-
-          PARAM_COUNT=$(echo $PARAMS_JSON | jq '.Parameters | length')
-          echo "Successfully fetched $PARAM_COUNT parameters from SSM."
-
-          echo "$PARAMS_JSON" | jq -r '.Parameters[] | {K: .Name, V: .Value} | "\(.K)\t\(.V)"' \
-            | awk -F'\t' '{k=$1; gsub(".*/","",k); printf("%s=%s\n", toupper(k), $2)}' \
-            > .env
-
-        # 3. Validation Echos
-        - echo "Checking if .env file exists..." && [ -f .env ] && echo ".env created."
-        - echo "Masked .env preview (first 3 chars of values):"
+            --with-decryption \
+            --query "Parameters[*].[Name,Value]" \
+            --output text | awk -F'\t' '{
+              full_path=$1; 
+              val=$2; 
+              n=split(full_path, parts, "/"); 
+              key=toupper(parts[n]); 
+              print key "=" val 
+            }' > .env
+        
+        # 2. Security Check & Logging
+        - echo "Secrets fetched. Validating .env file..."
+        - "[ -s .env ] && echo 'SUCCESS: .env created and populated' || (echo 'ERROR: .env is empty' && exit 1)"
+        
+        # 3. Masked Preview (Safe for logs)
+        - echo "Masked .env preview:"
         - sed -E 's/^([^=]+=)(...).*$/\1\2*******/' .env | sort
 
-        - echo "Build Environment Info:"
-        - echo "AWS_BRANCH=$AWS_BRANCH"
-        - echo "APP_ENV=$APP_ENV"
-
-        # 4. Environment Setup
+        # 4. Standard Setup
         - export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
         - nvm install 20 && nvm use 20
-        - node -v
         - npm ci
     build:
       commands:
