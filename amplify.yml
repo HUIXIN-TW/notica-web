@@ -4,28 +4,36 @@ frontend:
     preBuild:
       commands:
         - set -euo pipefail
-        # Read SSM parameters by path based on APP_ENV
-        # Path structure: /notica/<env>/
-        # Secrets are read during build, not stored in Amplify Console env vars
-        - >
-          : "${APP_ENV:?APP_ENV is required (production|staging|development)}" &&
-          aws ssm get-parameters-by-path
-          --region ap-southeast-2
-          --path "/notion-sync-gcal/${APP_ENV}/"
-          --recursive
-          --with-decryption
-          --query 'Parameters[].{K:Name,V:Value}'
-          --output text
-          | awk -F'\t' '{k=$1; gsub(".*/","",k); printf("%s=%s\n", toupper(k), $2)}'
-          > .env
+        # 1. Validate environment
+        - ': "${APP_ENV:?APP_ENV is required (production|staging|development)}"'
+        - echo "Fetching secrets from SSM for path /notion-sync-gcal/${APP_ENV}/..."
 
-        # list masked .env
-        - echo "Masked .env preview:" && sed -E 's/^([^=]+=)(...).*$/\1\2*******/' .env | sort
+        # 2. Fetch SSM parameters and transform into .env
+        # We echo the count of parameters found to verify connectivity without leaking data
+        - |
+          PARAMS_JSON=$(aws ssm get-parameters-by-path \
+            --region ap-southeast-2 \
+            --path "/notion-sync-gcal/${APP_ENV}/" \
+            --recursive \
+            --with-decryption)
 
-        # list specific env vars: AWS_BRANCH=staging
-        - echo "Specific env vars:" && echo "AWS_BRANCH=${AWS_BRANCH-}" && echo "NODE_ENV=${NODE_ENV-<unset>}"
+          PARAM_COUNT=$(echo $PARAMS_JSON | jq '.Parameters | length')
+          echo "Successfully fetched $PARAM_COUNT parameters from SSM."
 
-        # Node version
+          echo "$PARAMS_JSON" | jq -r '.Parameters[] | {K: .Name, V: .Value} | "\(.K)\t\(.V)"' \
+            | awk -F'\t' '{k=$1; gsub(".*/","",k); printf("%s=%s\n", toupper(k), $2)}' \
+            > .env
+
+        # 3. Validation Echos
+        - echo "Checking if .env file exists..." && [ -f .env ] && echo ".env created."
+        - echo "Masked .env preview (first 3 chars of values):"
+        - sed -E 's/^([^=]+=)(...).*$/\1\2*******/' .env | sort
+
+        - echo "Build Environment Info:"
+        - echo "AWS_BRANCH=$AWS_BRANCH"
+        - echo "APP_ENV=$APP_ENV"
+
+        # 4. Environment Setup
         - export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
         - nvm install 20 && nvm use 20
         - node -v
