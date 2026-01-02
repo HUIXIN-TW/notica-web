@@ -11,10 +11,7 @@ export const revalidate = false; // or：export const dynamic = "force-static";
 export default function FaqPage() {
   return (
     <div>
-      <MarkdownFetch
-        src="/markdown/FAQ.md"
-        errorText="Failed to load FAQ."
-      />
+      <MarkdownFetch src="/markdown/FAQ.md" errorText="Failed to load FAQ." />
     </div>
   );
 }
