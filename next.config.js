@@ -21,7 +21,7 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  output: "standalone",
+  output: "export",
   webpack: (config) => {
     config.experiments = config.experiments || {};
     config.experiments.layers = true;
