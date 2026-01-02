@@ -1,14 +1,23 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import NotionCard from "@components/notioncard/NotionCard";
+import SignInButton from "@components/button/SignInButton";
+import { useAuth } from "@auth/AuthContext";
 
 const NotionConfigPage = () => {
-  const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
 
-  if (status === "loading") return <div>Loading session...</div>;
+  if (loading) return <div>Loading session...</div>;
+  if (!user) {
+    return (
+      <div>
+        <p>Please sign in to view your configuration.</p>
+        <SignInButton />
+      </div>
+    );
+  }
 
-  return <NotionCard session={session} />;
+  return <NotionCard session={{ user, isNewUser: false }} />;
 };
 
 export default NotionConfigPage;

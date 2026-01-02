@@ -1,6 +1,6 @@
 "use client";
 
-import logger, { isProdRuntime as isProd } from "@utils/shared/logger";
+import logger, { isProdRuntime as isProd } from "@utils/logger";
 
 export function getPollingTimings() {
   return {
@@ -13,7 +13,12 @@ export function getPollingTimings() {
 
 export async function fetchUser() {
   try {
-    const res = await fetch(`/api/user/me`, { cache: "no-store" });
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!baseUrl) return null;
+    const res = await fetch(`${baseUrl}/user/me`, {
+      cache: "no-store",
+      credentials: "include",
+    });
     const data = await res.json().catch(() => null);
     if (!res.ok)
       throw new Error(data?.message || `Failed to fetch user (${res.status})`);

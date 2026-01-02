@@ -1,4 +1,4 @@
-import logger from "@utils/shared/logger";
+import logger from "@utils/logger";
 
 const POPUP_FEATURES = "width=500,height=700,noopener,noreferrer";
 const POPUP_NAME = "notica-auth";
@@ -35,7 +35,8 @@ export function isNotionMobileApp(userAgentOverride) {
 export function buildSignInUrl(callbackPath) {
   const origin = window.location.origin;
   const callback = new URL(callbackPath, origin).toString();
-  const url = new URL("/api/auth/signin/google", origin);
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || origin;
+  const url = new URL("/auth/login", baseUrl);
   url.searchParams.set("callbackUrl", callback);
   return url.toString();
 }

@@ -1,24 +1,24 @@
 "use client";
-import logger from "@utils/shared/logger";
+import logger from "@utils/logger";
 import { useState } from "react";
 import Button from "@components/button/Button";
-import { useSession } from "next-auth/react";
 
 const ConnectNotionButton = ({ className, style, text }) => {
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
 
   async function handleClick() {
-    if (!session?.user) {
-      alert("Please log in to sync.");
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!baseUrl) {
+      alert("Demo mode: Notion connection is disabled.");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Request an auth URL for Notion OAuth
-      const res = await fetch("/api/notion/auth-url");
+      const res = await fetch(`${baseUrl}/integrations/notion/auth-url`, {
+        credentials: "include",
+      });
       const data = await res.json();
 
       if (!res.ok || data.error) {
@@ -27,7 +27,6 @@ const ConnectNotionButton = ({ className, style, text }) => {
         );
         return;
       }
-      // Redirect user to Google consent screen
       window.location.href = data.url;
     } catch (err) {
       logger.error("Refresh Notion failed", err);

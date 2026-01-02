@@ -3,22 +3,20 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import SignInButton from "@components/button/SignInButton";
 import styles from "./page.module.css";
-import { isEmbedded } from "@utils/client/embed-context";
+import { isEmbedded } from "@utils/embed-context";
+import SignInButton from "@components/button/SignInButton";
+import { useAuth } from "@auth/AuthContext";
 
 export default function Home() {
   const router = useRouter();
-  const { status } = useSession();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (isEmbedded()) {
       router.replace("/embedded/profile");
-    } else if (status === "authenticated") {
-      router.replace("/profile");
     }
-  }, [status, router]);
+  }, [router]);
 
   return (
     <div className={styles.home}>
@@ -44,7 +42,9 @@ export default function Home() {
         <br />
         <br />
       </div>
-      {status === "unauthenticated" && <SignInButton />}
+      {loading && <p>Checking session…</p>}
+      {!user && !loading && <SignInButton />}
+      {user && <p>Welcome back, {user.username || user.email}.</p>}
     </div>
   );
 }

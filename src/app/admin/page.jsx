@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,9 +12,10 @@ import {
   Legend,
 } from "chart.js";
 import Button from "@components/button/Button";
-import formatTimestamp from "@utils/client/format-timestamp";
-import formatSyncLog from "@utils/client/format-sync-log";
+import formatTimestamp from "@utils/format-timestamp";
+import formatSyncLog from "@utils/format-sync-log";
 import styles from "./admin.module.css";
+import { useAuth } from "@auth/AuthContext";
 
 ChartJS.register(
   LineElement,
@@ -30,9 +29,7 @@ ChartJS.register(
 import MigrationDashboard from "./migration/migration.jsx";
 
 export default function Admin() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-
+  const { user, loading } = useAuth();
   const [userCounts, setUserCounts] = useState(null);
   const [syncCounts, setSyncCounts] = useState(null);
   const [syncDailyCounts, setSyncDailyCounts] = useState(null);
@@ -41,27 +38,30 @@ export default function Admin() {
   const [migrationRefreshKey, setMigrationRefreshKey] = useState(null);
   const [expandedLogs, setExpandedLogs] = useState(new Set());
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  // gate: login + admin only
-  useEffect(() => {
-    if (
-      status === "unauthenticated" ||
-      (status === "authenticated" && session?.user?.role !== "admin")
-    ) {
-      router.push("/");
-    }
-  }, [status, session, router]);
 
   async function fetchDashboardData() {
     setLoading(true);
     setError(null);
     try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!baseUrl) throw new Error("Missing API base URL");
       const [uRes, sRes, lslRes, luRes] = await Promise.all([
-        fetch("/api/admin/user-metrics", { cache: "no-store" }),
-        fetch("/api/admin/sync-metrics", { cache: "no-store" }),
-        fetch("/api/admin/list-sync-log", { cache: "no-store" }),
-        fetch("/api/admin/list-user", { cache: "no-store" }),
+        fetch(`${baseUrl}/admin/user-metrics`, {
+          cache: "no-store",
+          credentials: "include",
+        }),
+        fetch(`${baseUrl}/admin/sync-metrics`, {
+          cache: "no-store",
+          credentials: "include",
+        }),
+        fetch(`${baseUrl}/admin/list-sync-log`, {
+          cache: "no-store",
+          credentials: "include",
+        }),
+        fetch(`${baseUrl}/admin/list-user`, {
+          cache: "no-store",
+          credentials: "include",
+        }),
       ]);
       if (!uRes.ok) throw new Error(`user-metrics ${uRes.status}`);
       if (!sRes.ok) throw new Error(`sync-metrics ${sRes.status}`);
@@ -83,10 +83,11 @@ export default function Admin() {
     }
   }
 
-  // useEffect(() => {
-  //   if (status === "authenticated" && session?.user?.role === "admin")
-  //     fetchDashboardData();
-  // }, [status, session]);
+  useEffect(() => {
+    if (!loading && user?.role === "admin") {
+      fetchDashboardData();
+    }
+  }, [loading, user]);
 
   const usersChart = useMemo(() => {
     const labels = (userCounts ?? []).map((d) => d.createdAt);
@@ -215,11 +216,9 @@ export default function Admin() {
     fetchDashboardData();
   };
 
-  if (
-    status === "loading" ||
-    (status === "authenticated" && session?.user?.role !== "admin")
-  ) {
-    return <div>Loading…</div>;
+  if (loading) return <div>Loading session...</div>;
+  if (!user || user.role !== "admin") {
+    return <div>Admin access only.</div>;
   }
 
   return (

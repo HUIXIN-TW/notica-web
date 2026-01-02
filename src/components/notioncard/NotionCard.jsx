@@ -1,5 +1,5 @@
 "use client";
-import logger from "@utils/shared/logger";
+import logger from "@utils/logger";
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./notioncard.module.css";
 import SaveButton from "@components/button/SaveButton";

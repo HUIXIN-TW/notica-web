@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Button from "@components/button/Button";
-import logger from "@utils/shared/logger";
-import validateConfigFormat from "@utils/client/validate-config-format";
+import logger from "@utils/logger";
+import validateConfigFormat from "@utils/validate-config-format";
 
 export default function SaveButton({
   editableConfig,
@@ -46,9 +46,15 @@ export default function SaveButton({
     }
 
     try {
-      const res = await fetch("/api/notion/service/config", {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!baseUrl) {
+        alert("Demo mode: saving is disabled.");
+        return;
+      }
+      const res = await fetch(`${baseUrl}/integrations/notion/service/config`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 

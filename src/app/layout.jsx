@@ -1,7 +1,7 @@
 import "../styles/global.css";
-import Provider from "@components/provider/Provider";
 import TopNavBar from "@components/topnavbar/TopNavBar";
 import Footer from "@components/footer/Footer";
+import { AuthProvider } from "@auth/AuthContext";
 
 export const metadata = {
   metadataBase: new URL(
@@ -19,7 +19,7 @@ const RootLayout = ({ children }) => (
     <body>
       <div className="gradient-layer" />
       <div className="content-layer">
-        <Provider>
+        <AuthProvider>
           <div className="top-section">
             <TopNavBar />
           </div>
@@ -29,7 +29,7 @@ const RootLayout = ({ children }) => (
           <div className="footer-section">
             <Footer />
           </div>
-        </Provider>
+        </AuthProvider>
       </div>
     </body>
   </html>

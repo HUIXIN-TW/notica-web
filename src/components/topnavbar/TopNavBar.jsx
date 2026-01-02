@@ -2,17 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { isEmbedded } from "@utils/client/embed-context";
+import { isEmbedded } from "@utils/embed-context";
 import NavigateButton from "@components/button/NavigateButton";
 import SignOutButton from "@components/button/SignOutButton";
+import { useAuth } from "@auth/AuthContext";
 import {
   Plug,
   Settings,
   HelpCircle,
-  LogOut,
   ChartSpline,
   CalendarSync,
+  LogOut,
 } from "lucide-react";
 
 function Btn({ type = "navigate", path, text, icon }) {
@@ -22,7 +22,6 @@ function Btn({ type = "navigate", path, text, icon }) {
         className="clear_btn"
         text={icon ?? text ?? <LogOut size={20} strokeWidth={2} />}
         title="Sign Out"
-        aria-label="Sign Out"
       />
     );
   }
@@ -40,9 +39,8 @@ function Btn({ type = "navigate", path, text, icon }) {
 
 export default function TopNavBar() {
   const pathname = usePathname();
-  const { data } = useSession();
-  const role = data?.user?.role;
-  const isAdmin = role === "admin";
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const [embedded, setEmbedded] = useState(false);
 
   useEffect(() => {

@@ -1,20 +1,14 @@
 "use client";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import Button from "@components/button/Button";
-import config from "@/config/client/notion";
-import logger from "@utils/shared/logger";
+import config from "@config/notion";
+import logger from "@utils/logger";
 
 const LinkToNotionTemplateButton = ({ className, style, text }) => {
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
-
   async function handleClick() {
     try {
       setLoading(true);
-      logger.info("Redirecting to Notion template", {
-        user: session?.user?.email,
-      });
       window.open(config.NOTION_PAGE_TEMPLATE_URL, "_blank");
     } catch (err) {
       logger.error("Failed to link to Notion template", err);

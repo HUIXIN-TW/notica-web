@@ -1,12 +1,12 @@
 "use client";
-import { isProdRuntime as isProd } from "@utils/shared/logger";
+import { isProdRuntime as isProd } from "@utils/logger";
 import { useCountdown } from "@hooks/useCountdown";
 import { useElapsedTime } from "@hooks/useElapsedTime";
 import useSyncHandler from "@hooks/useSyncHandler";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./profile.module.css";
-import config from "@config/client/rate-limit";
+import config from "@config/rate-limit";
 import SyncButton from "@components/button/SyncButton";
 import SupportSection from "@components/profile/SupportSection";
 
@@ -58,7 +58,7 @@ const Profile = ({ session }) => {
         {!image && (
           <img
             className={styles.profile_default_image}
-            src="./assets/images/notica.png"
+            src="/assets/images/notica.png"
             alt="Default Profile Image"
           />
         )}

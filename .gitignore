@@ -1,5 +1,8 @@
-node_modules/*
-.next/*
 .DS_Store
 .env
 .env.local
+# dependencies
+node_modules/
+# build output
+out/
+.next/

@@ -3,17 +3,17 @@
 import styles from "./getting-started.module.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import Button from "@components/button/Button";
 import { useConnectionNotice } from "@hooks/useConnectionNotice";
 import ConnectGCalButton from "@components/button/ConnectGCalButton";
 import ConnectNotionButton from "@components/button/ConnectNotionButton";
 import LinkToNotionTemplateButton from "@components/button/LinkToNotionTemplateButton";
+import { useAuth } from "@auth/AuthContext";
 
 const GettingStarted = () => {
-  const { data: session } = useSession();
   const router = useRouter();
   useConnectionNotice();
+  const { user, loading } = useAuth();
 
   const [googleStatus, setGoogleStatus] = useState(null);
   const [notionStatus, setNotionStatus] = useState(null);
@@ -29,7 +29,8 @@ const GettingStarted = () => {
     router.replace("/notion/config");
   };
 
-  if (!session?.user) return <div>Please log in to get started.</div>;
+  if (loading) return <div>Loading session...</div>;
+  if (!user) return <div>Please sign in to get started.</div>;
 
   return (
     <>

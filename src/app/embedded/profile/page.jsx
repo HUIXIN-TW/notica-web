@@ -1,21 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import SignInButton from "@components/button/SignInButton";
 import SyncButton from "@components/button/SyncButton";
 import NavigateButton from "@components/button/NavigateButton";
 import useSyncHandler from "@hooks/useSyncHandler";
 import { useCountdown } from "@hooks/useCountdown";
 import { useElapsedTime } from "@hooks/useElapsedTime";
-import config from "@config/client/rate-limit";
+import config from "@config/rate-limit";
 import styles from "./profile.module.css";
-import { isProdRuntime as isProd } from "@utils/shared/logger";
-import { isNotionMobileApp } from "@utils/client/embed-context";
+import { isProdRuntime as isProd } from "@utils/logger";
+import { isNotionMobileApp } from "@utils/embed-context";
+import { useAuth } from "@auth/AuthContext";
 
 export default function EmbedSyncPage() {
-  const { data: session } = useSession();
-  const user = session?.user;
+  const { user, loading } = useAuth();
   const [isNotionMobile, setIsNotionMobile] = useState(false);
 
   useEffect(() => {
@@ -61,14 +59,9 @@ export default function EmbedSyncPage() {
   return (
     <div className={styles.card}>
       <h1 className={styles.title}>Notica Sync</h1>
-      {!user && (
-        <>
-          <p className={styles.description}>
-            Sign in with Google to connect your calendar and trigger manual
-            syncs from this embed.
-          </p>
-          <SignInButton />
-        </>
+      {loading && <p className={styles.description}>Loading…</p>}
+      {!loading && !user && (
+        <p className={styles.description}>Please sign in to sync.</p>
       )}
       {user && (
         <>
@@ -81,21 +74,21 @@ export default function EmbedSyncPage() {
             onSync={handleSync}
             disabled={isSyncing || (isCountingDown && isProd)}
           />
-          {syncResult && (
-            <>
-              <div className={styles.divider} />
-              <div className={styles.status}>
-                Last Status: <strong>{syncResult?.type ?? "-"}</strong>
-              </div>
-              <div className={styles.result_message}>
-                {syncResult?.message
-                  ? syncResult?.type === "sync_success"
-                    ? `Last sync at ${syncResult?.message?.trigger_time || "-"}`
-                    : syncResult?.message
-                  : "-"}
-              </div>
-            </>
-          )}
+        </>
+      )}
+      {syncResult && (
+        <>
+          <div className={styles.divider} />
+          <div className={styles.status}>
+            Last Status: <strong>{syncResult?.type ?? "-"}</strong>
+          </div>
+          <div className={styles.result_message}>
+            {syncResult?.message
+              ? syncResult?.type === "sync_success"
+                ? `Last sync at ${syncResult?.message?.trigger_time || "-"}`
+                : syncResult?.message
+              : "-"}
+          </div>
         </>
       )}
     </div>

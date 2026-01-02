@@ -1,29 +1,35 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import logger from "@utils/shared/logger";
+import logger from "@utils/logger";
 
 export function useNotionConfig() {
-  const { data: session, status } = useSession();
-
   const [editableConfig, setEditableConfig] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const loadConfig = useCallback(async () => {
-    if (!session?.user) {
-      logger.warn("[useNotionConfig] no session user; skip loading");
-      setError("Not authenticated");
-      return;
-    }
-
     try {
       if (loading) return;
       setLoading(true);
       setError(null);
-
-      const res = await fetch("/api/notion/service/config", { method: "GET" });
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!baseUrl) {
+        try {
+          const res = await fetch("/templates/notion_config.json");
+          const data = await res.json();
+          setEditableConfig(data);
+          setError("Demo mode: showing example configuration.");
+        } catch (err) {
+          setEditableConfig(null);
+          setError("Demo mode: config is unavailable.");
+        }
+        return;
+      }
+      const res = await fetch(`${baseUrl}/integrations/notion/service/config`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       if (!res.ok) {
         logger.error("[useNotionConfig] fetch failed", res.statusText);
@@ -52,8 +58,6 @@ export function useNotionConfig() {
   }, [session?.user]);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
-
     try {
       const cached = localStorage.getItem("notionConfig");
       if (cached) {
@@ -65,7 +69,7 @@ export function useNotionConfig() {
     }
 
     loadConfig();
-  }, [status, loadConfig]);
+  }, [loadConfig]);
 
   return {
     editableConfig,

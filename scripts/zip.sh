@@ -1,1 +1,0 @@
-zip -r ./archive.zip . -x "*.git*" "node_modules/*" ".next*" ".env" "images/*" "public/assets/*" "src/templates/*"

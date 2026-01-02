@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSession } from "next-auth/react";
 
 const formatBuildVersion = (isoString) => {
   if (!isoString) return null;
@@ -14,14 +13,10 @@ const formatBuildVersion = (isoString) => {
 };
 
 export default function Footer() {
-  const { status } = useSession();
-
   const buildVersion = useMemo(
     () => formatBuildVersion(process.env.NEXT_PUBLIC_BUILD_VERSION),
     [],
   );
-
-  if (status === "loading") return null;
 
   return (
     <div className="footer-content">

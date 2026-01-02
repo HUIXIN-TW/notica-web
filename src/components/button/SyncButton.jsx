@@ -1,37 +1,35 @@
 "use client";
-import logger from "@utils/shared/logger";
-import { pollLastSyncLog } from "@utils/client/polling-user-last-sync-log";
+import logger from "@utils/logger";
+import { pollLastSyncLog } from "@utils/polling-user-last-sync-log";
 import { useState } from "react";
 import Button from "@components/button/Button";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@auth/AuthContext";
 
 const SyncButton = ({ text, onSync, disabled }) => {
-  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   async function triggerSync() {
     logger.debug("[SyncButton] onClick fired", { loading, disabled });
-    if (!session?.user) {
-      logger.warn("[SyncButton] no session user; prompting login");
+    if (!user) {
       alert("Please log in to sync.");
       return;
     }
-
-    const body = {
-      uuid: session.user.uuid,
-      email: session.user.email,
-    };
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!baseUrl) {
+      alert("Demo mode: sync is disabled.");
+      return;
+    }
 
     const syncPromise = (async () => {
       if (loading) return;
       setLoading(true);
       try {
-        // trigger sync
         const enqueueAtMs = Date.now();
-        const res = await fetch("/api/sync", {
+        const res = await fetch(`${baseUrl}/sync`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          credentials: "include",
         });
 
         const triggerResult = await res.json().catch(() => ({}));
@@ -54,7 +52,6 @@ const SyncButton = ({ text, onSync, disabled }) => {
         }
 
         logger.debug("[SyncButton] sync enqueued", triggerResult);
-        // poll for completion
         return await pollLastSyncLog({
           triggerTimeMs: enqueueAtMs,
         });
@@ -74,7 +71,7 @@ const SyncButton = ({ text, onSync, disabled }) => {
   return (
     <Button
       type="button"
-      text={text}
+      text={text || "Sync Calendar"}
       onClick={triggerSync}
       disabled={loading || disabled}
     />
