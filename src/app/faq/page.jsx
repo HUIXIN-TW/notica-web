@@ -1,6 +1,4 @@
-"use client";
-import { useEffect, useState } from "react";
-import MarkdownRenderer from "@components/markdown/MarkdownRenderer";
+import MarkdownFetch from "@components/markdown/MarkdownFetch";
 
 export const metadata = {
   title: "FAQ — NOTICA",
@@ -11,30 +9,12 @@ export const metadata = {
 export const revalidate = false; // or：export const dynamic = "force-static";
 
 export default function FaqPage() {
-  const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    fetch("/markdown/FAQ.md")
-      .then((res) => res.text())
-      .then((text) => {
-        if (mounted) setContent(text);
-      })
-      .catch(() => {
-        if (mounted) setContent("Failed to load FAQ.");
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   return (
     <div>
-      {loading ? <div>Loading...</div> : <MarkdownRenderer content={content} />}
+      <MarkdownFetch
+        src="/markdown/FAQ.md"
+        errorText="Failed to load FAQ."
+      />
     </div>
   );
 }
