@@ -11,6 +11,24 @@
   gap: 20px;
 }
 
+.notice_success {
+  padding: 10px 14px;
+  margin: 0 40px;
+  border-radius: 10px;
+  background: #e7f7ed;
+  color: #1e7f3c;
+  font-weight: 600;
+}
+
+.notice_error {
+  padding: 10px 14px;
+  margin: 0 40px;
+  border-radius: 10px;
+  background: #fde8e8;
+  color: #b42318;
+  font-weight: 600;
+}
+
 /* ---------- Top-Level Key-Value Rows ---------- */
 .gettingstartedcard_row {
   display: grid;

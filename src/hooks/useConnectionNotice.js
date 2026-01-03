@@ -1,17 +1,20 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 export function useConnectionNotice() {
   const params = useSearchParams();
+  const [notice, setNotice] = useState(null);
+  const [noticeType, setNoticeType] = useState("success");
 
-  useEffect(() => {
+  const parsed = useMemo(() => {
     const google = params.get("google");
     const notion = params.get("notion");
     const reason = params.get("reason");
 
     let googleMsg = null;
     let notionMsg = null;
+    let type = "success";
 
     // ----- Google -----
     if (google === "connected") {
@@ -26,6 +29,7 @@ export function useConnectionNotice() {
       } else {
         googleMsg = "❌ Google authorization failed, please try again later";
       }
+      type = "error";
     }
 
     // ----- Notion -----
@@ -39,10 +43,29 @@ export function useConnectionNotice() {
       } else {
         notionMsg = "❌ Notion authorization failed, please try again later";
       }
+      type = "error";
     }
 
-    // Save to localStorage
+    return {
+      googleMsg,
+      notionMsg,
+      type,
+    };
+  }, [params]);
+
+  useEffect(() => {
+    const { googleMsg, notionMsg, type } = parsed;
     if (googleMsg) localStorage.setItem("googleStatus", googleMsg);
     if (notionMsg) localStorage.setItem("notionStatus", notionMsg);
-  }, [params]);
+
+    const msg = googleMsg || notionMsg;
+    if (msg) {
+      setNotice(msg);
+      setNoticeType(type);
+    } else {
+      setNotice(null);
+    }
+  }, [parsed]);
+
+  return { notice, noticeType };
 }

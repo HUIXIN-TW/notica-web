@@ -2,6 +2,7 @@
 import logger from "@utils/logger";
 import { useState } from "react";
 import Button from "@components/button/Button";
+import { openAuthWindow } from "@utils/embed-context";
 
 const ConnectNotionButton = ({ className, style, text }) => {
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,9 @@ const ConnectNotionButton = ({ className, style, text }) => {
         );
         return;
       }
-      window.location.href = data.url;
+      if (!openAuthWindow(data.url)) {
+        window.location.href = data.url;
+      }
     } catch (err) {
       logger.error("Refresh Notion failed", err);
       alert("Error fetching auth URL: " + err.message);
