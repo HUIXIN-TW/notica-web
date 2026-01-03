@@ -14,10 +14,7 @@ const formatBuildVersion = (isoString) => {
 };
 
 export default function Footer() {
-  const buildVersion = useMemo(
-    () => formatBuildVersion(env.BUILD_VERSION),
-    [],
-  );
+  const buildVersion = useMemo(() => formatBuildVersion(env.BUILD_VERSION), []);
 
   return (
     <div className="footer-content">
