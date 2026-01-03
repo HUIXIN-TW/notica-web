@@ -10,8 +10,7 @@ import config from "@config/rate-limit";
 import SyncButton from "@components/button/SyncButton";
 import SupportSection from "@components/profile/SupportSection";
 
-const Profile = ({ session }) => {
-  const user = session?.user;
+const Profile = ({ user, isNewUser }) => {
   const router = useRouter();
 
   // Rate limit configuration
@@ -30,12 +29,12 @@ const Profile = ({ session }) => {
 
   // --- 1. Load from session: If new user, redirect to getting started ---
   useEffect(() => {
-    if (session?.isNewUser) {
+    if (isNewUser) {
       // set local storage flag
       localStorage.setItem("newUser:v1", "true");
       router.push("/getting-started");
     }
-  }, [session, router]);
+  }, [isNewUser, router]);
 
   // User details
   if (!user) {

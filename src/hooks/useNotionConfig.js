@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import logger from "@utils/logger";
+import env from "@config/env";
 
 export function useNotionConfig() {
   const [editableConfig, setEditableConfig] = useState(null);
@@ -13,7 +14,7 @@ export function useNotionConfig() {
       if (loading) return;
       setLoading(true);
       setError(null);
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const baseUrl = env.API_BASE_URL;
       if (!baseUrl) {
         try {
           const res = await fetch("/templates/notion_config.json");
@@ -55,7 +56,7 @@ export function useNotionConfig() {
     } finally {
       setTimeout(() => setLoading(false), 3000);
     }
-  }, [session?.user]);
+  }, [loading]);
 
   useEffect(() => {
     try {

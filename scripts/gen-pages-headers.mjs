@@ -1,8 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
+import env from "../src/config/env.js";
 
-const isProd =
-  (process.env.NEXT_PUBLIC_APP_ENV || process.env.APP_ENV || "production") ===
-  "production";
+const isProd = env.APP_ENV === "production";
 
 // Allow framing from Notion and self
 const frameAncestors = [
@@ -14,7 +13,7 @@ const frameAncestors = [
 
 // Allow framing from localhost in development
 if (!isProd) {
-  frameAncestors.push("http://localhost:4000", "http://127.0.0.1:4000");
+  frameAncestors.push("http://localhost:5000", "http://127.0.0.1:5000");
 }
 
 const csp = `frame-ancestors ${frameAncestors.join(" ")};`;

@@ -4,9 +4,6 @@ import Footer from "@components/footer/Footer";
 import { AuthProvider } from "@auth/AuthContext";
 
 export const metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://huixinyang.com",
-  ),
   title: {
     default: "WhatNow Studio",
     template: "%s | WhatNow Studio",

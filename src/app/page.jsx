@@ -18,6 +18,12 @@ export default function Home() {
     }
   }, [router]);
 
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/profile");
+    }
+  }, [loading, user, router]);
+
   return (
     <div className={styles.home}>
       <h2>Welcome to NOTICA!</h2>
@@ -42,9 +48,7 @@ export default function Home() {
         <br />
         <br />
       </div>
-      {loading && <p>Checking session…</p>}
       {!user && !loading && <SignInButton />}
-      {user && <p>Welcome back, {user.username || user.email}.</p>}
     </div>
   );
 }
