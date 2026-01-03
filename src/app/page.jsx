@@ -44,7 +44,6 @@ export default function Home() {
       </div>
       {loading && <p>Checking session…</p>}
       {!user && !loading && <SignInButton />}
-      {user && <p>Welcome back, {user.username || user.email}.</p>}
     </div>
   );
 }

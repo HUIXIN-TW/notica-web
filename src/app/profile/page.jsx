@@ -19,7 +19,7 @@ const MyProfile = () => {
 
   return (
     <div>
-      <Profile session={{ user, isNewUser: false }} />
+      <Profile user={user} isNewUser={false} />
     </div>
   );
 };

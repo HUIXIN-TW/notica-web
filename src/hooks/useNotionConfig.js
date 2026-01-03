@@ -55,7 +55,7 @@ export function useNotionConfig() {
     } finally {
       setTimeout(() => setLoading(false), 3000);
     }
-  }, [session?.user]);
+  }, [loading]);
 
   useEffect(() => {
     try {

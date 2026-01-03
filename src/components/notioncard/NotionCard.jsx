@@ -10,7 +10,7 @@ import ConfigMapSection from "@components/notioncard/notiontab/NotionTabsSection
 import NotionTabs from "@components/notioncard/notiontab/NotionTabs";
 import { useNotionConfig } from "@/hooks/useNotionConfig";
 
-const NotionCard = ({ session }) => {
+const NotionCard = () => {
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
   const [messages, setMessages] = useState(null);
@@ -53,10 +53,6 @@ const NotionCard = ({ session }) => {
       ? editableConfig.page_property[0] || {}
       : editableConfig.page_property;
   }, [editableConfig]);
-
-  if (!session?.user) {
-    return <div>Please log in to view your configuration.</div>;
-  }
 
   if (loading && !editableConfig) {
     return <div>Loading configuration...</div>;
