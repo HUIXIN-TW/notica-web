@@ -4,6 +4,7 @@ import { pollLastSyncLog } from "@utils/polling-user-last-sync-log";
 import { useState } from "react";
 import Button from "@components/button/Button";
 import { useAuth } from "@auth/AuthContext";
+import env from "@config/env";
 
 const SyncButton = ({ text, onSync, disabled }) => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,7 @@ const SyncButton = ({ text, onSync, disabled }) => {
       alert("Please log in to sync.");
       return;
     }
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const baseUrl = env.API_BASE_URL;
     if (!baseUrl) {
       alert("Demo mode: sync is disabled.");
       return;

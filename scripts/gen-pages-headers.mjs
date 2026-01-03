@@ -1,7 +1,7 @@
-const { mkdirSync, writeFileSync } = require("node:fs");
+import { mkdirSync, writeFileSync } from "node:fs";
+import env from "../src/config/env.js";
 
-const isProd =
-  (process.env.NEXT_PUBLIC_APP_ENV || "production") === "production";
+const isProd = env.APP_ENV === "production";
 
 // Allow framing from Notion and self
 const frameAncestors = [

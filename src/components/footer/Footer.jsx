@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import env from "@config/env";
 
 const formatBuildVersion = (isoString) => {
   if (!isoString) return null;
@@ -14,7 +15,7 @@ const formatBuildVersion = (isoString) => {
 
 export default function Footer() {
   const buildVersion = useMemo(
-    () => formatBuildVersion(process.env.NEXT_PUBLIC_BUILD_VERSION),
+    () => formatBuildVersion(env.BUILD_VERSION),
     [],
   );
 
