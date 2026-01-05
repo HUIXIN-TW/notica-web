@@ -1,0 +1,15 @@
+{
+  "name": "Japan Trip",
+  "short_name": "Japan Trip",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/tmp/japan-trip.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
