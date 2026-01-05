@@ -94,6 +94,140 @@
   line-height: 1.6;
 }
 
+.extras {
+  width: min(1100px, 95vw);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.cardSummary {
+  list-style: none;
+  font-weight: 700;
+  font-size: 18px;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.cardSummary::-webkit-details-marker {
+  display: none;
+}
+
+.cardSummary::after {
+  content: "＋";
+  float: right;
+  color: #94a3b8;
+}
+
+.card[open] .cardSummary::after {
+  content: "−";
+}
+
+.cardBody {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.checkItem input {
+  width: 18px;
+  height: 18px;
+  accent-color: #22c55e;
+}
+
+.sentenceList {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  line-height: 1.7;
+  color: #1f2937;
+}
+
+.sentenceList li {
+  display: grid;
+  gap: 4px;
+}
+
+.jp {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.zh {
+  color: #475569;
+  font-size: 14px;
+}
+
+.infoList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.infoList li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.infoLabel {
+  font-weight: 600;
+}
+
+.infoValue {
+  font-variant-numeric: tabular-nums;
+  color: #2563eb;
+}
+
+.infoActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.copyButton {
+  border: none;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.copyButton:hover {
+  background: #bae6fd;
+}
+
 @media (max-width: 768px) {
   .mapPage {
     padding: 32px 16px;
@@ -114,5 +248,9 @@
 
   .day {
     padding: 16px;
+  }
+
+  .extras {
+    gap: 14px;
   }
 }

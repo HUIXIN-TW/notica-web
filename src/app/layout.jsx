@@ -1,5 +1,4 @@
 import "../styles/global.css";
-import TopNavBar from "@components/topnavbar/TopNavBar";
 import Footer from "@components/footer/Footer";
 import { AuthProvider } from "@auth/AuthContext";
 
@@ -27,9 +26,6 @@ const RootLayout = ({ children }) => (
       <div className="gradient-layer" />
       <div className="content-layer">
         <AuthProvider>
-          <div className="top-section">
-            <TopNavBar />
-          </div>
           <div className="main-section">
             <main>{children}</main>
           </div>

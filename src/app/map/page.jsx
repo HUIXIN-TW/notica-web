@@ -192,6 +192,149 @@ export default function MapPage() {
           </ul>
         </details>
       </section>
+      <section className={styles.extras}>
+        <details className={styles.card}>
+          <summary className={styles.cardSummary}>出發前小清單</summary>
+          <div className={styles.cardBody}>
+            <div className={styles.checklist}>
+              <label className={styles.checkItem}>
+                <input type="checkbox" />
+                <span>護照 Passport</span>
+              </label>
+              <label className={styles.checkItem}>
+                <input type="checkbox" />
+                <span>日圓 JPY</span>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <details className={styles.card}>
+          <summary className={styles.cardSummary}>旅途中常用日文</summary>
+          <div className={styles.cardBody}>
+            <ol className={styles.sentenceList}>
+            <li>
+              <span className={styles.jp}>すみません、駅はどこですか。</span>
+              <span className={styles.zh}>不好意思，車站在哪裡？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>この電車は大阪に行きますか。</span>
+              <span className={styles.zh}>這班電車會到大阪嗎？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>切符を二枚ください。</span>
+              <span className={styles.zh}>請給我兩張票。</span>
+            </li>
+            <li>
+              <span className={styles.jp}>おすすめの料理は何ですか。</span>
+              <span className={styles.zh}>推薦的料理是什麼？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>お会計をお願いします。</span>
+              <span className={styles.zh}>請結帳。</span>
+            </li>
+            <li>
+              <span className={styles.jp}>クレジットカードは使えますか。</span>
+              <span className={styles.zh}>可以使用信用卡嗎？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>写真を撮ってもらえますか。</span>
+              <span className={styles.zh}>可以幫我拍照嗎？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>トイレはどこですか。</span>
+              <span className={styles.zh}>廁所在哪裡？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>これはいくらですか。</span>
+              <span className={styles.zh}>這個多少錢？</span>
+            </li>
+            <li>
+              <span className={styles.jp}>道に迷いました、助けてください。</span>
+              <span className={styles.zh}>我迷路了，請幫幫我。</span>
+            </li>
+            </ol>
+          </div>
+        </details>
+
+        <details className={styles.card}>
+          <summary className={styles.cardSummary}>飯店資訊卡</summary>
+          <div className={styles.cardBody}>
+            <ul className={styles.infoList}>
+            <li>
+              <span className={styles.infoLabel}>飯店名（日/英）</span>
+              <span className={styles.infoValue}>
+                GRIDS PREMIUM HOTEL OSAKA NAMBA
+              </span>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>地址（日文原文）</span>
+              <span className={styles.infoValue}>
+                大阪府大阪市浪速区難波中1丁目7-7
+              </span>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>電話</span>
+              <a className={styles.infoValue} href="tel:+81666350810">
+                +81 6-6635-0810
+              </a>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>入住時間</span>
+              <span className={styles.infoValue}>2026-01-08 3pm</span>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>退房時間</span>
+              <span className={styles.infoValue}>2026-01-10 11am</span>
+            </li>
+            </ul>
+          </div>
+        </details>
+
+        <details className={styles.card}>
+          <summary className={styles.cardSummary}>當地緊急電話</summary>
+          <div className={styles.cardBody}>
+            <ul className={styles.infoList}>
+            <li>
+              <span className={styles.infoLabel}>警察</span>
+              <a className={styles.infoValue} href="tel:110">
+                110
+              </a>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>消防／救護車</span>
+              <a className={styles.infoValue} href="tel:119">
+                119
+              </a>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>海上保安廳</span>
+              <a className={styles.infoValue} href="tel:118">
+                118
+              </a>
+            </li>
+            <li>
+              <span className={styles.infoLabel}>觀光諮詢（多語）</span>
+              <div className={styles.infoActions}>
+                <a className={styles.infoValue} href="tel:05038162787">
+                  050-3816-2787
+                </a>
+                <button
+                  type="button"
+                  className={styles.copyButton}
+                  onClick={() =>
+                    navigator.clipboard.writeText("050-3816-2787")
+                  }
+                  aria-label="複製觀光諮詢電話"
+                >
+                  複製
+                </button>
+              </div>
+            </li>
+            </ul>
+          </div>
+        </details>
+      </section>
       <div className={styles.frameWrapper}>
         <iframe
           title="Notica map"
