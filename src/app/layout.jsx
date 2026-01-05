@@ -8,6 +8,16 @@ export const metadata = {
     default: "WhatNow Studio",
     template: "%s | WhatNow Studio",
   },
+  applicationName: "Japan Trip",
+  appleWebApp: {
+    title: "Japan Trip",
+    capable: true,
+  },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/tmp/japan-trip.png",
+    apple: "/tmp/japan-trip.png",
+  },
   authors: [{ name: "Huixin Yang" }],
 };
 
