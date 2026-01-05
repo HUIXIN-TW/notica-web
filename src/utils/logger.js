@@ -1,6 +1,7 @@
 import env from "@config/env";
 
-const isProd = env.APP_ENV.toLowerCase() === "production";
+const appEnv = env.APP_ENV || "development";
+const isProd = appEnv.toLowerCase() === "production";
 
 // helpers
 export function maskValue(value, visible = 4) {
