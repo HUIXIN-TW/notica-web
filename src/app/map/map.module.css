@@ -60,6 +60,9 @@
 
 .dayTitle {
   list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 20px;
   font-weight: 700;
   color: #0f172a;
@@ -72,7 +75,7 @@
 
 .dayTitle::after {
   content: "＋";
-  margin-left: auto;
+  margin-left: 16px;
   font-size: 20px;
   color: #64748b;
 }
@@ -175,9 +178,30 @@
   color: #0f172a;
 }
 
+.romaji {
+  font-size: 14px;
+  color: #334155;
+}
+
 .zh {
   color: #475569;
   font-size: 14px;
+}
+
+.speakButton {
+  align-self: flex-start;
+  border: none;
+  background: #ecfeff;
+  color: #0e7490;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.speakButton:hover {
+  background: #cffafe;
 }
 
 .infoList {

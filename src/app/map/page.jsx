@@ -1,8 +1,47 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import styles from "./map.module.css";
 
 export default function MapPage() {
+  const [jaVoice, setJaVoice] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      return undefined;
+    }
+
+    const pickVoice = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const match = voices.find((voice) =>
+        (voice.lang || "").toLowerCase().startsWith("ja"),
+      );
+      if (match) {
+        setJaVoice(match);
+      }
+    };
+
+    pickVoice();
+    window.speechSynthesis.addEventListener("voiceschanged", pickVoice);
+
+    return () => {
+      window.speechSynthesis.removeEventListener("voiceschanged", pickVoice);
+    };
+  }, []);
+
+  const speak = (text) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "ja-JP";
+    if (jaVoice) {
+      utterance.voice = jaVoice;
+    }
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+
   return (
     <div className={styles.mapPage}>
       <section className={styles.itinerary}>
@@ -205,6 +244,14 @@ export default function MapPage() {
                 <input type="checkbox" />
                 <span>日圓 JPY</span>
               </label>
+              <label className={styles.checkItem}>
+                <input type="checkbox" />
+                <span>台幣 NTD</span>
+              </label>
+              <label className={styles.checkItem}>
+                <input type="checkbox" />
+                <span>整理錢包</span>
+              </label>
             </div>
           </div>
         </details>
@@ -213,46 +260,304 @@ export default function MapPage() {
           <summary className={styles.cardSummary}>旅途中常用日文</summary>
           <div className={styles.cardBody}>
             <ol className={styles.sentenceList}>
-            <li>
-              <span className={styles.jp}>すみません、駅はどこですか。</span>
-              <span className={styles.zh}>不好意思，車站在哪裡？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>この電車は大阪に行きますか。</span>
-              <span className={styles.zh}>這班電車會到大阪嗎？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>切符を二枚ください。</span>
-              <span className={styles.zh}>請給我兩張票。</span>
-            </li>
-            <li>
-              <span className={styles.jp}>おすすめの料理は何ですか。</span>
-              <span className={styles.zh}>推薦的料理是什麼？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>お会計をお願いします。</span>
-              <span className={styles.zh}>請結帳。</span>
-            </li>
-            <li>
-              <span className={styles.jp}>クレジットカードは使えますか。</span>
-              <span className={styles.zh}>可以使用信用卡嗎？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>写真を撮ってもらえますか。</span>
-              <span className={styles.zh}>可以幫我拍照嗎？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>トイレはどこですか。</span>
-              <span className={styles.zh}>廁所在哪裡？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>これはいくらですか。</span>
-              <span className={styles.zh}>這個多少錢？</span>
-            </li>
-            <li>
-              <span className={styles.jp}>道に迷いました、助けてください。</span>
-              <span className={styles.zh}>我迷路了，請幫幫我。</span>
-            </li>
+              <li>
+                <span className={styles.jp}>すみません、駅はどこですか。</span>
+                <span className={styles.romaji}>
+                  Sumimasen, eki wa doko desu ka.
+                </span>
+                <span className={styles.zh}>不好意思，車站在哪裡？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("すみません、駅はどこですか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>この電車は大阪に行きますか。</span>
+                <span className={styles.romaji}>
+                  Kono densha wa Osaka ni ikimasu ka.
+                </span>
+                <span className={styles.zh}>這班電車會到大阪嗎？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("この電車は大阪に行きますか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>切符を二枚ください。</span>
+                <span className={styles.romaji}>Kippu o nimai kudasai.</span>
+                <span className={styles.zh}>請給我兩張票。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("切符を二枚ください。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>おすすめの料理は何ですか。</span>
+                <span className={styles.romaji}>
+                  Osusume no ryori wa nan desu ka.
+                </span>
+                <span className={styles.zh}>推薦的料理是什麼？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("おすすめの料理は何ですか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>お会計をお願いします。</span>
+                <span className={styles.romaji}>Okaikei o onegaishimasu.</span>
+                <span className={styles.zh}>請結帳。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("お会計をお願いします。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>
+                  クレジットカードは使えますか。
+                </span>
+                <span className={styles.romaji}>
+                  Kurejitto kado wa tsukaemasu ka.
+                </span>
+                <span className={styles.zh}>可以使用信用卡嗎？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("クレジットカードは使えますか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>写真を撮ってもらえますか。</span>
+                <span className={styles.romaji}>
+                  Shashin o totte moraemasu ka.
+                </span>
+                <span className={styles.zh}>可以幫我拍照嗎？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("写真を撮ってもらえますか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>トイレはどこですか。</span>
+                <span className={styles.romaji}>Toire wa doko desu ka.</span>
+                <span className={styles.zh}>廁所在哪裡？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("トイレはどこですか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>これはいくらですか。</span>
+                <span className={styles.romaji}>Kore wa ikura desu ka.</span>
+                <span className={styles.zh}>這個多少錢？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("これはいくらですか。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>いらっしゃいませ。</span>
+                <span className={styles.romaji}>Irasshaimase.</span>
+                <span className={styles.zh}>歡迎光臨。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("いらっしゃいませ。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>こんにちは。</span>
+                <span className={styles.romaji}>Konnichiwa.</span>
+                <span className={styles.zh}>你好（白天）。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("こんにちは。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>こんばんは。</span>
+                <span className={styles.romaji}>Konbanwa.</span>
+                <span className={styles.zh}>你好（晚上）。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("こんばんは。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>何名様ですか？</span>
+                <span className={styles.romaji}>Nanmei sama desu ka?</span>
+                <span className={styles.zh}>幾位？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("何名様ですか？")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>こちらでお召し上がりですか？</span>
+                <span className={styles.romaji}>
+                  Kochira de omeshiagari desu ka?
+                </span>
+                <span className={styles.zh}>內用嗎？</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("こちらでお召し上がりですか？")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>一人です。</span>
+                <span className={styles.romaji}>Hitori desu.</span>
+                <span className={styles.zh}>一人。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("一人です。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>二人です。</span>
+                <span className={styles.romaji}>Futari desu.</span>
+                <span className={styles.zh}>兩人。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("二人です。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>五人です。</span>
+                <span className={styles.romaji}>Gonin desu.</span>
+                <span className={styles.zh}>五人。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("五人です。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>はい。</span>
+                <span className={styles.romaji}>Hai.</span>
+                <span className={styles.zh}>是的。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("はい。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>いいえ。</span>
+                <span className={styles.romaji}>Iie.</span>
+                <span className={styles.zh}>不是。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("いいえ。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>お願いします。</span>
+                <span className={styles.romaji}>Onegaishimasu.</span>
+                <span className={styles.zh}>麻煩了／拜託。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("お願いします。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>ありがとうございます。</span>
+                <span className={styles.romaji}>Arigatou gozaimasu.</span>
+                <span className={styles.zh}>謝謝您。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("ありがとうございます。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>
+                  こんにちは、二人です。お願いします。
+                </span>
+                <span className={styles.romaji}>
+                  Konnichiwa, futari desu. Onegaishimasu.
+                </span>
+                <span className={styles.zh}>你好，我們兩位，麻煩了。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("こんにちは、二人です。お願いします。")}
+                >
+                  朗讀
+                </button>
+              </li>
+              <li>
+                <span className={styles.jp}>
+                  道に迷いました、助けてください。
+                </span>
+                <span className={styles.romaji}>
+                  Michi ni mayoimashita, tasukete kudasai.
+                </span>
+                <span className={styles.zh}>我迷路了，請幫幫我。</span>
+                <button
+                  type="button"
+                  className={styles.speakButton}
+                  onClick={() => speak("道に迷いました、助けてください。")}
+                >
+                  朗讀
+                </button>
+              </li>
             </ol>
           </div>
         </details>
@@ -261,32 +566,32 @@ export default function MapPage() {
           <summary className={styles.cardSummary}>飯店資訊卡</summary>
           <div className={styles.cardBody}>
             <ul className={styles.infoList}>
-            <li>
-              <span className={styles.infoLabel}>飯店名（日/英）</span>
-              <span className={styles.infoValue}>
-                GRIDS PREMIUM HOTEL OSAKA NAMBA
-              </span>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>地址（日文原文）</span>
-              <span className={styles.infoValue}>
-                大阪府大阪市浪速区難波中1丁目7-7
-              </span>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>電話</span>
-              <a className={styles.infoValue} href="tel:+81666350810">
-                +81 6-6635-0810
-              </a>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>入住時間</span>
-              <span className={styles.infoValue}>2026-01-08 3pm</span>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>退房時間</span>
-              <span className={styles.infoValue}>2026-01-10 11am</span>
-            </li>
+              <li>
+                <span className={styles.infoLabel}>飯店名</span>
+                <span className={styles.infoValue}>
+                  GRIDS PREMIUM HOTEL OSAKA NAMBA
+                </span>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>地址</span>
+                <span className={styles.infoValue}>
+                  大阪府大阪市浪速区難波中1丁目7-7
+                </span>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>電話</span>
+                <a className={styles.infoValue} href="tel:+81666350810">
+                  +81 6-6635-0810
+                </a>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>入住時間</span>
+                <span className={styles.infoValue}>3pm</span>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>退房時間</span>
+                <span className={styles.infoValue}>11am</span>
+              </li>
             </ul>
           </div>
         </details>
@@ -295,42 +600,42 @@ export default function MapPage() {
           <summary className={styles.cardSummary}>當地緊急電話</summary>
           <div className={styles.cardBody}>
             <ul className={styles.infoList}>
-            <li>
-              <span className={styles.infoLabel}>警察</span>
-              <a className={styles.infoValue} href="tel:110">
-                110
-              </a>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>消防／救護車</span>
-              <a className={styles.infoValue} href="tel:119">
-                119
-              </a>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>海上保安廳</span>
-              <a className={styles.infoValue} href="tel:118">
-                118
-              </a>
-            </li>
-            <li>
-              <span className={styles.infoLabel}>觀光諮詢（多語）</span>
-              <div className={styles.infoActions}>
-                <a className={styles.infoValue} href="tel:05038162787">
-                  050-3816-2787
+              <li>
+                <span className={styles.infoLabel}>警察</span>
+                <a className={styles.infoValue} href="tel:110">
+                  110
                 </a>
-                <button
-                  type="button"
-                  className={styles.copyButton}
-                  onClick={() =>
-                    navigator.clipboard.writeText("050-3816-2787")
-                  }
-                  aria-label="複製觀光諮詢電話"
-                >
-                  複製
-                </button>
-              </div>
-            </li>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>消防／救護車</span>
+                <a className={styles.infoValue} href="tel:119">
+                  119
+                </a>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>海上保安廳</span>
+                <a className={styles.infoValue} href="tel:118">
+                  118
+                </a>
+              </li>
+              <li>
+                <span className={styles.infoLabel}>觀光諮詢（多語）</span>
+                <div className={styles.infoActions}>
+                  <a className={styles.infoValue} href="tel:05038162787">
+                    050-3816-2787
+                  </a>
+                  <button
+                    type="button"
+                    className={styles.copyButton}
+                    onClick={() =>
+                      navigator.clipboard.writeText("050-3816-2787")
+                    }
+                    aria-label="複製觀光諮詢電話"
+                  >
+                    複製
+                  </button>
+                </div>
+              </li>
             </ul>
           </div>
         </details>
