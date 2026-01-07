@@ -330,30 +330,6 @@ export default function MapPage() {
       </section>
       <section className={styles.extras}>
         <details className={styles.card}>
-          <summary className={styles.cardSummary}>出發前小清單</summary>
-          <div className={styles.cardBody}>
-            <div className={styles.checklist}>
-              <label className={styles.checkItem}>
-                <input type="checkbox" />
-                <span>護照 Passport</span>
-              </label>
-              <label className={styles.checkItem}>
-                <input type="checkbox" />
-                <span>日圓 JPY</span>
-              </label>
-              <label className={styles.checkItem}>
-                <input type="checkbox" />
-                <span>台幣 NTD</span>
-              </label>
-              <label className={styles.checkItem}>
-                <input type="checkbox" />
-                <span>整理錢包</span>
-              </label>
-            </div>
-          </div>
-        </details>
-
-        <details className={styles.card}>
           <summary className={styles.cardSummary}>出飯店前 10 秒清單</summary>
           <div className={styles.cardBody}>
             <div className={styles.preflight} ref={preflightRef}>
