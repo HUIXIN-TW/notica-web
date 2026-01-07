@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./map.module.css";
 
 export default function MapPage() {
   const [jaVoice, setJaVoice] = useState(null);
+  const [preflightPercent, setPreflightPercent] = useState(0);
+  const [preflightTotal, setPreflightTotal] = useState(0);
+  const [preflightRemaining, setPreflightRemaining] = useState(0);
+  const preflightRef = useRef(null);
+  const preflightStorageKey = "preflightChecklist";
 
   useEffect(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
@@ -42,12 +47,104 @@ export default function MapPage() {
     window.speechSynthesis.speak(utterance);
   };
 
+  useEffect(() => {
+    const container = preflightRef.current;
+    if (!container || typeof window === "undefined") {
+      return undefined;
+    }
+
+    const inputs = Array.from(
+      container.querySelectorAll('input[type="checkbox"]'),
+    );
+    const saved = JSON.parse(localStorage.getItem(preflightStorageKey) || "[]");
+
+    inputs.forEach((input, index) => {
+      input.checked = Boolean(saved[index]);
+    });
+
+    const updateProgress = () => {
+      const total = inputs.length;
+      const checked = inputs.filter((input) => input.checked).length;
+      const percent = total ? Math.round((checked / total) * 100) : 0;
+      setPreflightPercent(percent);
+      setPreflightTotal(total);
+      setPreflightRemaining(total - checked);
+      localStorage.setItem(
+        preflightStorageKey,
+        JSON.stringify(inputs.map((input) => input.checked)),
+      );
+    };
+
+    inputs.forEach((input) => input.addEventListener("change", updateProgress));
+    updateProgress();
+
+    return () => {
+      inputs.forEach((input) =>
+        input.removeEventListener("change", updateProgress),
+      );
+    };
+  }, []);
+
+  const resetPreflight = () => {
+    const container = preflightRef.current;
+    if (!container || typeof window === "undefined") {
+      return;
+    }
+    const inputs = Array.from(
+      container.querySelectorAll('input[type="checkbox"]'),
+    );
+    inputs.forEach((input) => {
+      input.checked = false;
+    });
+    setPreflightPercent(0);
+    setPreflightRemaining(inputs.length);
+    setPreflightTotal(inputs.length);
+    localStorage.setItem(
+      preflightStorageKey,
+      JSON.stringify(inputs.map(() => false)),
+    );
+  };
+
+  const sharePreflight = async () => {
+    const total = preflightTotal || 0;
+    const remaining = preflightRemaining || 0;
+    const container = preflightRef.current;
+    const unchecked = container
+      ? Array.from(
+          container.querySelectorAll('input[type="checkbox"]:not(:checked)'),
+        )
+          .map((input) => {
+            const label = input.closest("label");
+            const textNode = label?.querySelector("span");
+            return textNode?.textContent?.trim() || "";
+          })
+          .filter(Boolean)
+      : [];
+    const remainingText = unchecked.length
+      ? `未勾項目：${unchecked.join("、")}`
+      : "未勾項目：無";
+    const message = `出飯店前檢查完成 ${preflightPercent}%（已勾 ${total - remaining}/${total}），還有 ${remaining} 項未勾。${remainingText}。準備出發！`;
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ text: message });
+        return;
+      } catch {
+        return;
+      }
+    }
+
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(message);
+    }
+  };
+
   return (
     <div className={styles.mapPage}>
       <section className={styles.itinerary}>
-        <h2 className={styles.sectionTitle}>行程總覽</h2>
+        <h2 className={styles.sectionTitle}>日本行程總覽</h2>
 
-        <details className={styles.day} open>
+        <details className={styles.day}>
           <summary className={styles.dayTitle}>
             Day 1｜大阪（抵達＋難波・心齋橋・通天閣）
           </summary>
@@ -252,6 +349,299 @@ export default function MapPage() {
                 <input type="checkbox" />
                 <span>整理錢包</span>
               </label>
+            </div>
+          </div>
+        </details>
+
+        <details className={styles.card}>
+          <summary className={styles.cardSummary}>出飯店前 10 秒清單</summary>
+          <div className={styles.cardBody}>
+            <div className={styles.preflight} ref={preflightRef}>
+              <div className={styles.preflightProgress}>
+                <div className={styles.preflightProgressHeader}>
+                  <span>CHECKLIST BEFORE LEAVING</span>
+                  <div className={styles.preflightProgressActions}>
+                    <strong>{preflightPercent}%</strong>
+                    <button
+                      type="button"
+                      className={styles.resetButton}
+                      onClick={resetPreflight}
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.shareButton}
+                      onClick={sharePreflight}
+                    >
+                      Share
+                    </button>
+                  </div>
+                </div>
+                <div className={styles.preflightProgressBar}>
+                  <span
+                    className={styles.preflightProgressFill}
+                    style={{ width: `${preflightPercent}%` }}
+                  />
+                </div>
+              </div>
+              <div className={styles.preflightSection}>
+                <div className={styles.preflightHeader}>
+                  <span className={styles.preflightIndex}>1</span>
+                  <span className={styles.preflightTitle}>隨身重要物品</span>
+                </div>
+                <div className={styles.preflightList}>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>護照</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>錢包</span>
+                    </label>
+                    <div className={styles.preflightSublist}>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>日圓 JPY</span>
+                        </label>
+                      </div>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>信用卡</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>ICOCA / Suica（是否有餘額）</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>手機（確認電量 ≥ 50%）</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>行動電源 & 充電線</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>飯店房卡</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>攜帶垃圾袋（日本分類）</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.preflightSection}>
+                <div className={styles.preflightHeader}>
+                  <span className={styles.preflightIndex}>2</span>
+                  <span className={styles.preflightTitle}>手機與網路</span>
+                </div>
+                <div className={styles.preflightList}>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>eSIM / 網路是否正常</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>Google Map 已下載離線地圖</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>行程、餐廳、車站地址可離線查看</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>LINE / WhatsApp 可收訊（緊急聯絡）</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.preflightSection}>
+                <div className={styles.preflightHeader}>
+                  <span className={styles.preflightIndex}>3</span>
+                  <span className={styles.preflightTitle}>當天天氣對應</span>
+                </div>
+                <div className={styles.preflightList}>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>❄️ 冷</span>
+                    </label>
+                    <div className={styles.preflightSublist}>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>圍巾、手套</span>
+                        </label>
+                      </div>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>外套是否需要加一層</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>☀️ 晴</span>
+                    </label>
+                    <div className={styles.preflightSublist}>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>防曬</span>
+                        </label>
+                      </div>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>太陽眼鏡</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.preflightSection}>
+                <div className={styles.preflightHeader}>
+                  <span className={styles.preflightIndex}>4</span>
+                  <span className={styles.preflightTitle}>行程檢查</span>
+                </div>
+                <div className={styles.preflightList}>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>今天第一站「怎麼去」</span>
+                    </label>
+                    <div className={styles.preflightSublist}>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>最近車站</span>
+                        </label>
+                      </div>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>要搭哪條線（JR / 私鐵 / 地鐵）</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>是否有「指定時間」行程</span>
+                    </label>
+                    <div className={styles.preflightSublist}>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>餐廳預約</span>
+                        </label>
+                      </div>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>車票（新幹線、特急）</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.preflightSection}>
+                <div className={styles.preflightHeader}>
+                  <span className={styles.preflightIndex}>5</span>
+                  <span className={styles.preflightTitle}>錢與購物</span>
+                </div>
+                <div className={styles.preflightList}>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>今天是否要逛街？</span>
+                    </label>
+                    <div className={styles.preflightSublist}>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>帶可退稅的護照或QR Code</span>
+                        </label>
+                      </div>
+                      <div className={styles.preflightRow}>
+                        <label className={styles.checkItem}>
+                          <input type="checkbox" />
+                          <span>帶購物用大袋 / 折疊袋</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>現金是否夠（便利商店不是每家都能刷卡）</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.preflightSection}>
+                <div className={styles.preflightHeader}>
+                  <span className={styles.preflightIndex}>6</span>
+                  <span className={styles.preflightTitle}>安全與細節</span>
+                </div>
+                <div className={styles.preflightList}>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>房間電器是否關好（暖氣、吹風機）</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>窗戶是否關</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
+                      <span>貴重物品是否已收好（或放保險箱）</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </details>
