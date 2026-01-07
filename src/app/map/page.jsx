@@ -8,8 +8,10 @@ export default function MapPage() {
   const [preflightPercent, setPreflightPercent] = useState(0);
   const [preflightTotal, setPreflightTotal] = useState(0);
   const [preflightRemaining, setPreflightRemaining] = useState(0);
+  const [meetingTime, setMeetingTime] = useState("");
   const preflightRef = useRef(null);
   const preflightStorageKey = "preflightChecklist";
+  const preflightTimeKey = "preflightMeetingTime";
 
   useEffect(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
@@ -57,10 +59,14 @@ export default function MapPage() {
       container.querySelectorAll('input[type="checkbox"]'),
     );
     const saved = JSON.parse(localStorage.getItem(preflightStorageKey) || "[]");
+    const savedTime = localStorage.getItem(preflightTimeKey);
 
     inputs.forEach((input, index) => {
       input.checked = Boolean(saved[index]);
     });
+    if (savedTime) {
+      setMeetingTime(savedTime);
+    }
 
     const updateProgress = () => {
       const total = inputs.length;
@@ -123,7 +129,10 @@ export default function MapPage() {
     const remainingText = unchecked.length
       ? `未勾項目：${unchecked.join("、")}`
       : "未勾項目：無";
-    const message = `出飯店前檢查完成 ${preflightPercent}%（已勾 ${total - remaining}/${total}），還有 ${remaining} 項未勾。${remainingText}。準備出發！`;
+    const timeText = meetingTime
+      ? `集合時間：${meetingTime}`
+      : "集合時間：未填";
+    const message = `出飯店前檢查完成 ${preflightPercent}%（已勾 ${total - remaining}/${total}），還有 ${remaining} 項未勾。${remainingText}。${timeText}。準備出發！`;
 
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
@@ -360,6 +369,20 @@ export default function MapPage() {
                     style={{ width: `${preflightPercent}%` }}
                   />
                 </div>
+                <label className={styles.preflightTime}>
+                  <span>集合時間（選填）</span>
+                  <input
+                    type="time"
+                    value={meetingTime}
+                    onChange={(event) => {
+                      const nextValue = event.target.value;
+                      setMeetingTime(nextValue);
+                      if (typeof window !== "undefined") {
+                        localStorage.setItem(preflightTimeKey, nextValue);
+                      }
+                    }}
+                  />
+                </label>
               </div>
               <div className={styles.preflightSection}>
                 <div className={styles.preflightHeader}>
@@ -414,6 +437,12 @@ export default function MapPage() {
                   <div className={styles.preflightRow}>
                     <label className={styles.checkItem}>
                       <input type="checkbox" />
+                      <span>eSIM / 網路是否正常</span>
+                    </label>
+                  </div>
+                  <div className={styles.preflightRow}>
+                    <label className={styles.checkItem}>
+                      <input type="checkbox" />
                       <span>飯店房卡</span>
                     </label>
                   </div>
@@ -424,44 +453,29 @@ export default function MapPage() {
                     </label>
                   </div>
                 </div>
+                <div className={styles.preflightRow}>
+                  <label className={styles.checkItem}>
+                    <input type="checkbox" />
+                    <span>出門前先上廁所</span>
+                  </label>
+                </div>
+                <div className={styles.preflightRow}>
+                  <label className={styles.checkItem}>
+                    <input type="checkbox" />
+                    <span>帶購物用大袋 / 折疊袋</span>
+                  </label>
+                </div>
+                <div className={styles.preflightRow}>
+                  <label className={styles.checkItem}>
+                    <input type="checkbox" />
+                    <span>準備可退稅QR</span>
+                  </label>
+                </div>
               </div>
 
               <div className={styles.preflightSection}>
                 <div className={styles.preflightHeader}>
                   <span className={styles.preflightIndex}>2</span>
-                  <span className={styles.preflightTitle}>手機與網路</span>
-                </div>
-                <div className={styles.preflightList}>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>eSIM / 網路是否正常</span>
-                    </label>
-                  </div>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>Google Map 已下載離線地圖</span>
-                    </label>
-                  </div>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>行程、餐廳、車站地址可離線查看</span>
-                    </label>
-                  </div>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>LINE / WhatsApp 可收訊（緊急聯絡）</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.preflightSection}>
-                <div className={styles.preflightHeader}>
-                  <span className={styles.preflightIndex}>3</span>
                   <span className={styles.preflightTitle}>當天天氣對應</span>
                 </div>
                 <div className={styles.preflightList}>
@@ -510,91 +524,7 @@ export default function MapPage() {
 
               <div className={styles.preflightSection}>
                 <div className={styles.preflightHeader}>
-                  <span className={styles.preflightIndex}>4</span>
-                  <span className={styles.preflightTitle}>行程檢查</span>
-                </div>
-                <div className={styles.preflightList}>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>今天第一站「怎麼去」</span>
-                    </label>
-                    <div className={styles.preflightSublist}>
-                      <div className={styles.preflightRow}>
-                        <label className={styles.checkItem}>
-                          <input type="checkbox" />
-                          <span>最近車站</span>
-                        </label>
-                      </div>
-                      <div className={styles.preflightRow}>
-                        <label className={styles.checkItem}>
-                          <input type="checkbox" />
-                          <span>要搭哪條線（JR / 私鐵 / 地鐵）</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>是否有「指定時間」行程</span>
-                    </label>
-                    <div className={styles.preflightSublist}>
-                      <div className={styles.preflightRow}>
-                        <label className={styles.checkItem}>
-                          <input type="checkbox" />
-                          <span>餐廳預約</span>
-                        </label>
-                      </div>
-                      <div className={styles.preflightRow}>
-                        <label className={styles.checkItem}>
-                          <input type="checkbox" />
-                          <span>車票（新幹線、特急）</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.preflightSection}>
-                <div className={styles.preflightHeader}>
-                  <span className={styles.preflightIndex}>5</span>
-                  <span className={styles.preflightTitle}>錢與購物</span>
-                </div>
-                <div className={styles.preflightList}>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>今天是否要逛街？</span>
-                    </label>
-                    <div className={styles.preflightSublist}>
-                      <div className={styles.preflightRow}>
-                        <label className={styles.checkItem}>
-                          <input type="checkbox" />
-                          <span>帶可退稅的護照或QR Code</span>
-                        </label>
-                      </div>
-                      <div className={styles.preflightRow}>
-                        <label className={styles.checkItem}>
-                          <input type="checkbox" />
-                          <span>帶購物用大袋 / 折疊袋</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.preflightRow}>
-                    <label className={styles.checkItem}>
-                      <input type="checkbox" />
-                      <span>現金是否夠（便利商店不是每家都能刷卡）</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.preflightSection}>
-                <div className={styles.preflightHeader}>
-                  <span className={styles.preflightIndex}>6</span>
+                  <span className={styles.preflightIndex}>3</span>
                   <span className={styles.preflightTitle}>安全與細節</span>
                 </div>
                 <div className={styles.preflightList}>
