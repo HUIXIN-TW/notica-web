@@ -17,7 +17,7 @@ const NotionConfigPage = () => {
     );
   }
 
-  return <NotionCard session={{ user, isNewUser: false }} />;
+  return <NotionCard />;
 };
 
 export default NotionConfigPage;

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useMemo } from "react";
 import { useBackendSession } from "@hooks/useBackendSession";
+import env from "@config/env";
 
 const AuthContext = createContext({
   user: null,
@@ -14,7 +15,7 @@ const AuthContext = createContext({
 
 export function AuthProvider({ children }) {
   const { user, status, error, refresh } = useBackendSession();
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const baseUrl = env.API_BASE_URL;
 
   const login = () => {
     if (!baseUrl) return;

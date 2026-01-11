@@ -12,7 +12,7 @@ import { useAuth } from "@auth/AuthContext";
 
 const GettingStarted = () => {
   const router = useRouter();
-  useConnectionNotice();
+  const { notice, noticeType } = useConnectionNotice();
   const { user, loading } = useAuth();
 
   const [googleStatus, setGoogleStatus] = useState(null);
@@ -35,6 +35,18 @@ const GettingStarted = () => {
   return (
     <>
       <h2>Let’s Get Your Sync Ready</h2>
+
+      {notice && (
+        <div
+          className={
+            noticeType === "success"
+              ? styles.notice_success
+              : styles.notice_error
+          }
+        >
+          {notice}
+        </div>
+      )}
 
       <div className={styles.gettingstartedcard_container}>
         <ConnectGCalButton

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Button from "@components/button/Button";
 import logger from "@utils/logger";
 import validateConfigFormat from "@utils/validate-config-format";
+import env from "@config/env";
 
 export default function SaveButton({
   editableConfig,
@@ -46,7 +47,7 @@ export default function SaveButton({
     }
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const baseUrl = env.API_BASE_URL;
       if (!baseUrl) {
         alert("Demo mode: saving is disabled.");
         return;

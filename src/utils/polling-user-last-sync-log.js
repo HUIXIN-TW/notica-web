@@ -1,6 +1,7 @@
 "use client";
 
 import logger, { isProdRuntime as isProd } from "@utils/logger";
+import env from "@config/env";
 
 export function getPollingTimings() {
   return {
@@ -13,7 +14,7 @@ export function getPollingTimings() {
 
 export async function fetchUser() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const baseUrl = env.API_BASE_URL;
     if (!baseUrl) return null;
     const res = await fetch(`${baseUrl}/user/me`, {
       cache: "no-store",

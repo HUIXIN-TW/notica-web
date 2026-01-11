@@ -4,14 +4,16 @@ import Footer from "@components/footer/Footer";
 import { AuthProvider } from "@auth/AuthContext";
 
 export const metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://huixinyang.com",
-  ),
   title: {
     default: "WhatNow Studio",
     template: "%s | WhatNow Studio",
   },
   authors: [{ name: "Huixin Yang" }],
+  icons: {
+    icon: "/assets/images/notica-colour.png",
+    apple: "/assets/images/notica-colour.png",
+    shortcut: "/assets/images/notica-colour.png",
+  },
 };
 
 const RootLayout = ({ children }) => (

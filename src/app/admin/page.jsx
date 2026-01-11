@@ -16,6 +16,7 @@ import formatTimestamp from "@utils/format-timestamp";
 import formatSyncLog from "@utils/format-sync-log";
 import styles from "./admin.module.css";
 import { useAuth } from "@auth/AuthContext";
+import env from "@config/env";
 
 ChartJS.register(
   LineElement,
@@ -43,7 +44,7 @@ export default function Admin() {
     setLoading(true);
     setError(null);
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const baseUrl = env.API_BASE_URL;
       if (!baseUrl) throw new Error("Missing API base URL");
       const [uRes, sRes, lslRes, luRes] = await Promise.all([
         fetch(`${baseUrl}/admin/user-metrics`, {

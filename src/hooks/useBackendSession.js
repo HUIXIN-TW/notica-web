@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import env from "@config/env";
 
 export function useBackendSession() {
   const [user, setUser] = useState(null);
@@ -8,7 +9,7 @@ export function useBackendSession() {
   const [error, setError] = useState(null);
 
   const load = useCallback(async () => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const baseUrl = env.API_BASE_URL;
     if (!baseUrl) {
       setUser(null);
       setStatus("unauthenticated");
