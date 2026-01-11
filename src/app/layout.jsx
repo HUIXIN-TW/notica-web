@@ -9,6 +9,11 @@ export const metadata = {
     template: "%s | WhatNow Studio",
   },
   authors: [{ name: "Huixin Yang" }],
+  icons: {
+    icon: "/assets/images/notica-colour.png",
+    apple: "/assets/images/notica-colour.png",
+    shortcut: "/assets/images/notica-colour.png",
+  },
 };
 
 const RootLayout = ({ children }) => (
