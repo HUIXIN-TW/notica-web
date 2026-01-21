@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import logger from "@utils/logger";
 import env from "@config/env";
 
@@ -8,10 +8,12 @@ export function useNotionConfig() {
   const [editableConfig, setEditableConfig] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const loadingRef = useRef(false);
 
   const loadConfig = useCallback(async () => {
     try {
-      if (loading) return;
+      if (loadingRef.current) return;
+      loadingRef.current = true;
       setLoading(true);
       setError(null);
       const baseUrl = env.API_BASE_URL;
@@ -54,9 +56,12 @@ export function useNotionConfig() {
       logger.error("[useNotionConfig] unexpected error", err);
       setError("Unexpected error occurred");
     } finally {
-      setTimeout(() => setLoading(false), 3000);
+      setTimeout(() => {
+        loadingRef.current = false;
+        setLoading(false);
+      }, 3000);
     }
-  }, [loading]);
+  }, []);
 
   useEffect(() => {
     try {
