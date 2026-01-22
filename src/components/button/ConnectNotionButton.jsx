@@ -2,12 +2,14 @@
 import logger from "@utils/logger";
 import { useState } from "react";
 import Button from "@components/button/Button";
+import { openAuthWindow } from "@utils/embed-context";
+import env from "@config/env";
 
 const ConnectNotionButton = ({ className, style, text }) => {
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const baseUrl = env.API_BASE_URL;
     if (!baseUrl) {
       alert("Demo mode: Notion connection is disabled.");
       return;
@@ -27,7 +29,9 @@ const ConnectNotionButton = ({ className, style, text }) => {
         );
         return;
       }
-      window.location.href = data.url;
+      if (!openAuthWindow(data.url)) {
+        window.location.href = data.url;
+      }
     } catch (err) {
       logger.error("Refresh Notion failed", err);
       alert("Error fetching auth URL: " + err.message);
